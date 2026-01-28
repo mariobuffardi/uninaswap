@@ -2,6 +2,7 @@ package it.unina.uninaswap.view;
 
 import it.unina.uninaswap.model.entity.Offerta;
 import it.unina.uninaswap.util.UITheme;
+import com.formdev.flatlaf.FlatClientProperties;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,10 +21,18 @@ public class NotificationView extends JPanel {
 
 
     private static final int CARD_W = 420;
-    private static final int CARD_H = 125;
-    private static final int HGAP = 12;
-    private static final int VGAP = 12;
-
+    private static final int CARD_H = 135;
+    private static final int HGAP = 15;
+    private static final int VGAP = 15;
+    
+    private static final Color SURFACE = Color.decode("#EAF2F9");
+    private static final Color SURFACE_2 = Color.decode("#F6FAFF");
+    private static final Color TITLE = UITheme.PRIMARY_DARK;
+    private static final Color SUBTLE = UITheme.TEXT_SECONDARY;
+    
+    private static final String CARD_STYLE = "arc: 20; background: #FFFFFF; border: 1,1,1,1,#D7E3F2;";
+    private static final String SECTION_STYLE = "arc: 18; background: #F6FAFF; border: 1,1,1,1,#D7E3F2;";
+    
     private JPanel ricevutePanel;
     private JPanel inviatePanel;
     private JPanel ricevuteAccettatePanel;
@@ -68,68 +77,63 @@ public class NotificationView extends JPanel {
 
     public NotificationView() {
         setLayout(new BorderLayout());
+        setBackground(SURFACE);
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(new EmptyBorder(12, 12, 12, 12));
+        mainPanel.setBackground(SURFACE);
 
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         scrollPane.setBorder(null);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.getViewport().setBackground(SURFACE);
+        scrollPane.setBackground(SURFACE);
         add(scrollPane, BorderLayout.CENTER);
-        setBackground(UITheme.BACKGROUND_LIGHT);
-        mainPanel.setBackground(UITheme.BACKGROUND_LIGHT);
+
 
 
         // OFFERTE RICEVUTE
-        JPanel ricevuteSection = new JPanel(new BorderLayout());
-        ricevuteSection.setBorder(new TitledBorder("Offerte ricevute (in attesa)"));
-
+        JPanel ricevuteSection = buildSection("Offerte ricevute (in attesa");
+        
         ricevutePanel = new JPanel();
-        ricevutePanel.setLayout(new GridLayout(0, currentCols, HGAP, VGAP));
-        ricevutePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
+        
+        styleInnerPanel(ricevutePanel);
         ricevuteSection.add(ricevutePanel, BorderLayout.CENTER);
         mainPanel.add(ricevuteSection);
-        mainPanel.add(Box.createVerticalStrut(16));
+        mainPanel.add(Box.createVerticalStrut(20));
 
         // OFFERTE INVIATE (IN ATTESA)
-        JPanel inviateSection = new JPanel(new BorderLayout());
-        inviateSection.setBorder(new TitledBorder("Offerte inviate (in attesa)"));
-
+        JPanel inviateSection = buildSection("Offerte inviate (in attesa)");
+        
         inviatePanel = new JPanel();
-        inviatePanel.setLayout(new GridLayout(0, currentCols, HGAP, VGAP));
-        inviatePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
+        styleInnerPanel(inviatePanel);
         inviateSection.add(inviatePanel, BorderLayout.CENTER);
         mainPanel.add(inviateSection);
-        mainPanel.add(Box.createVerticalStrut(16));
+        mainPanel.add(Box.createVerticalStrut(20));
 
 
         // OFFERTE RICEVUTE (ACCETTATE)
-        JPanel ricevuteAccSection = new JPanel(new BorderLayout());
-        ricevuteAccSection.setBorder(new TitledBorder("Offerte ricevute (Accettate)"));
+        JPanel ricevuteAccSection = buildSection("Offerte ricevute (Accettate)");
 
         ricevuteAccettatePanel = new JPanel();
-        ricevuteAccettatePanel.setLayout(new GridLayout(0, currentCols, HGAP, VGAP));
-        ricevuteAccettatePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        styleInnerPanel(ricevuteAccettatePanel);
 
         ricevuteAccSection.add(ricevuteAccettatePanel, BorderLayout.CENTER);
         mainPanel.add(ricevuteAccSection);
-        mainPanel.add(Box.createVerticalStrut(16));
+        mainPanel.add(Box.createVerticalStrut(20));
 
         
         // OFFERTE INVIATE (ACCETTATE)
-        JPanel inviateAccSection = new JPanel(new BorderLayout());
-        inviateAccSection.setBorder(new TitledBorder("Offerte inviate (Accettate)"));
+        JPanel inviateAccSection = buildSection("Offerte inviate (Accettate)");
 
         inviateAccettatePanel = new JPanel();
-        inviateAccettatePanel.setLayout(new GridLayout(0, currentCols, HGAP, VGAP));
-        inviateAccettatePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
+        
+        styleInnerPanel(inviateAccettatePanel);
         inviateAccSection.add(inviateAccettatePanel, BorderLayout.CENTER);
         mainPanel.add(inviateAccSection);
+        
         // Listener width
         scrollPane.getViewport().addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
@@ -142,6 +146,30 @@ public class NotificationView extends JPanel {
         SwingUtilities.invokeLater(this::updateColsAndRelayout);
     }
 
+
+    private void styleInnerPanel(JPanel p) {
+        // layout set dynamically
+        p.setOpaque(false); // transparent to show section background
+        p.setBorder(new EmptyBorder(6, 6, 6, 6));
+    }
+
+    private JPanel buildSection(String title) {
+        JPanel section = new JPanel(new BorderLayout());
+        section.setOpaque(true);
+        section.setBackground(SURFACE_2);
+        section.putClientProperty(FlatClientProperties.STYLE, SECTION_STYLE);
+        section.setBorder(new EmptyBorder(12, 12, 12, 12));
+
+        JLabel lbl = new JLabel(title);
+        lbl.setForeground(TITLE);
+        lbl.setFont(lbl.getFont().deriveFont(Font.BOLD, 16f));
+        lbl.setBorder(new EmptyBorder(0, 4, 10, 4));
+        section.add(lbl, BorderLayout.NORTH);
+
+        return section;
+    }
+
+    
     // Data setters 
     public void setOfferteRicevute(List<OffertaNotificationData> list) {
         this.offerteRicevute = (list == null) ? new ArrayList<>() : new ArrayList<>(list);
@@ -164,37 +192,34 @@ public class NotificationView extends JPanel {
     }
 
     private void refreshRicevute() {
-        buildSection(ricevutePanel, offerteRicevute, true,
-                "Nessuna offerta ricevuta in attesa.");
+        buildContent(ricevutePanel, offerteRicevute, true, "Nessuna offerta ricevuta in attesa.");
     }
 
     private void refreshInviate() {
-        buildSection(inviatePanel, offerteInviate, false,
-                "Nessuna offerta inviata in attesa.");
+        buildContent(inviatePanel, offerteInviate, false, "Nessuna offerta inviata in attesa.");
     }
 
     private void refreshRicevuteAccettate() {
-        buildSection(ricevuteAccettatePanel, offerteRicevuteAccettate, true,
-                "Nessuna offerta ricevuta accettata.");
+        buildContent(ricevuteAccettatePanel, offerteRicevuteAccettate, true, "Nessuna offerta ricevuta accettata.");
     }
 
     private void refreshInviateAccettate() {
-        buildSection(inviateAccettatePanel, offerteInviateAccettate, false,
-                "Nessuna offerta inviata accettata.");
+        buildContent(inviateAccettatePanel, offerteInviateAccettate, false, "Nessuna offerta inviata accettata.");
     }
 
-    private void buildSection(JPanel container, List<OffertaNotificationData> dataList, boolean ricevuta,
-            String emptyMsg) {
+    private void buildContent(JPanel container, List<OffertaNotificationData> dataList, boolean ricevuta, String emptyMsg) {
         if (container == null)
             return;
 
         container.removeAll();
 
         if (dataList == null || dataList.isEmpty()) {
-            JLabel lbl = new JLabel(emptyMsg, SwingConstants.LEFT);
-            lbl.setBorder(new EmptyBorder(5, 5, 5, 5));
             container.setLayout(new BorderLayout());
+            JLabel lbl = new JLabel(emptyMsg, SwingConstants.LEFT);
+            lbl.setForeground(SUBTLE);
+            lbl.setBorder(new EmptyBorder(8, 8, 8, 8));
             container.add(lbl, BorderLayout.NORTH);
+            
         } else {
             container.setLayout(new GridLayout(0, currentCols, HGAP, VGAP));
             for (OffertaNotificationData data : dataList) {
@@ -211,25 +236,24 @@ public class NotificationView extends JPanel {
     private JPanel createCompactCard(OffertaNotificationData data, boolean ricevuta) {
         JPanel card = new JPanel();
         card.setLayout(new BorderLayout(8, 6));
+        card.setOpaque(true);
         card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(UITheme.PRIMARY, 2, true),
-                new EmptyBorder(12, 12, 12, 12)));
+        card.putClientProperty(FlatClientProperties.STYLE, CARD_STYLE);
 
         Dimension fixed = new Dimension(CARD_W, CARD_H);
         card.setPreferredSize(fixed);
         card.setMinimumSize(fixed);
         card.setMaximumSize(fixed);
 
-        // TOP: titolo + meta (tipo + data)
+        // TOP
         JPanel top = new JPanel();
         top.setOpaque(false);
         top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
-        top.setBorder(new EmptyBorder(8, 10, 0, 10));
+        top.setBorder(new EmptyBorder(12, 14, 0, 14));
 
         JLabel lblTitolo = new JLabel(data.getTitoloAnnuncio());
-        lblTitolo.setFont(lblTitolo.getFont().deriveFont(Font.BOLD, 14f));
-        lblTitolo.setForeground(UITheme.PRIMARY_DARK);
+        lblTitolo.setFont(lblTitolo.getFont().deriveFont(Font.BOLD, 14.5f));
+        lblTitolo.setForeground(TITLE);
         top.add(lblTitolo);
 
         String tipo = (data.getTipologiaAnnuncio() == null || data.getTipologiaAnnuncio().isBlank())
@@ -237,8 +261,10 @@ public class NotificationView extends JPanel {
                 : data.getTipologiaAnnuncio();
 
         String ruolo = ricevuta ? "Ricevuta" : "Inviata";
-        JLabel lblMeta = new JLabel("Tipo: " + tipo + "  •  " + ruolo + " - " + safe(data.getDataOfferta()));
-        lblMeta.setFont(lblMeta.getFont().deriveFont(Font.ITALIC, 11f));
+
+        JLabel lblMeta = new JLabel("Tipo: " + tipo + " • " + ruolo + " • " + safe(data.getDataOfferta()));
+        lblMeta.setFont(lblMeta.getFont().deriveFont(Font.ITALIC, 11.5f));
+        lblMeta.setForeground(SUBTLE);
         top.add(lblMeta);
 
         card.add(top, BorderLayout.NORTH);
@@ -247,62 +273,80 @@ public class NotificationView extends JPanel {
         JPanel center = new JPanel();
         center.setOpaque(false);
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
-        center.setBorder(new EmptyBorder(4, 10, 6, 10));
+        center.setBorder(new EmptyBorder(6, 14, 8, 14));
 
         String prefix = ricevuta ? "Da: " : "A: ";
-        center.add(new JLabel(prefix + safe(data.getControparteDisplay())));
-
+        JLabel lblUser = new JLabel(prefix + safe(data.getControparteDisplay()));
+        lblUser.setForeground(TITLE);
+        center.add(lblUser);
+        
         // Importo
         if (data.getImportoDisplay() != null) {
             String imp = data.getImportoDisplay().trim();
             if (!imp.isEmpty() && !imp.equals("-") && !imp.equals("- €")) {
-                center.add(new JLabel("Importo: " + imp));
-            }
+                JLabel lblImp = new JLabel("Importo: " + imp);
+                lblImp.setForeground(TITLE);
+                lblImp.setFont(lblImp.getFont().deriveFont(Font.BOLD));
+                center.add(lblImp);
+                }
         }
 
         // Oggetto offerto 
         Offerta off = data.getOfferta();
         if (off != null && off.getOggettoOfferto() != null && !off.getOggettoOfferto().trim().isEmpty()) {
-            center.add(new JLabel("Oggetto offerto: " + off.getOggettoOfferto().trim()));
-        }
+            JLabel lblObj = new JLabel("Offre: " + off.getOggettoOfferto().trim());
+            lblObj.setForeground(TITLE);
+            center.add(lblObj);
+            }
 
         // Prima riga del messaggio
-        String preview = buildMessagePreview(off != null ? off.getMessaggio() : null);
-        if (!preview.isBlank()) {
-            JLabel lblMsg = new JLabel("Msg: " + preview);
-            lblMsg.setFont(lblMsg.getFont().deriveFont(11f));
-            center.add(lblMsg);
-        }
 
 
         if (!ricevuta && off != null && off.getStato() != null && "Accettata".equals(off.getStato().name())) {
             boolean can = (inviataListener != null) && inviataListener.canLasciaRecensione(off);
             if (can) {
-                JButton btnRec = new JButton("Lascia una recensione");
-                btnRec.addActionListener(e -> {
+            	JButton btnRec = new JButton("Lascia una recensione");
+            	btnRec.putClientProperty(FlatClientProperties.STYLE, "arc: 10; padding: 2,8,2,8; background: #EAF2F9; foreground: #1B415D; hoverBackground: #D7E3F2;");
+            	btnRec.setBorderPainted(false);
+            	btnRec.addActionListener(e -> {
                     if (inviataListener != null)
                         inviataListener.onLasciaRecensione(off);
                 });
-                center.add(Box.createVerticalStrut(4));
+                center.add(Box.createVerticalStrut(6));
                 center.add(btnRec);
-            } else {
-                JLabel lblDone = new JLabel("Recensione inviata");
-                lblDone.setFont(lblDone.getFont().deriveFont(Font.ITALIC, 11f));
-                center.add(Box.createVerticalStrut(4));
-                center.add(lblDone);
             }
         }
 
         card.add(center, BorderLayout.CENTER);
 
-        // Click card -> dialog dettagli
-        // Se ricevuta ed è Accettata: non è più interagibile
-        if (!(ricevuta && off != null && off.getStato() != null && "Accettata".equals(off.getStato().name()))) {
+
+        // Click interaction
+        // Se ricevuta e accettata -> no action. Altrimenti -> apri dialog
+        boolean isRicAcc = (ricevuta && off != null && off.getStato() != null && "Accettata".equals(off.getStato().name()));
+
+        if (!isRicAcc) {
             card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             card.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
+                	Component deep = SwingUtilities.getDeepestComponentAt(card, e.getX(), e.getY());
+                    if (deep instanceof JButton)
+                        return;
+
                     showOffertaDialog(data, ricevuta);
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    card.putClientProperty(FlatClientProperties.STYLE,
+                            "arc: 20; background: #FFFFFF; border: 1,1,1,1,#BFD3EA;");
+                    card.repaint();
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    card.putClientProperty(FlatClientProperties.STYLE, CARD_STYLE);
+                    card.repaint();
                 }
             });
         }
@@ -312,22 +356,6 @@ public class NotificationView extends JPanel {
 
     private String safe(String s) {
         return (s == null) ? "-" : s;
-    }
-
-    private String buildMessagePreview(String msg) {
-        if (msg == null)
-            return "";
-        String t = msg.trim();
-        if (t.isEmpty())
-            return "";
-        // prima riga
-        int idx = t.indexOf('\n');
-        if (idx >= 0)
-            t = t.substring(0, idx).trim();
-        // limite caratteri
-        if (t.length() > 60)
-            t = t.substring(0, 60).trim() + "...";
-        return t;
     }
 
     
@@ -341,62 +369,76 @@ public class NotificationView extends JPanel {
                 "Dettaglio offerta", Dialog.ModalityType.APPLICATION_MODAL);
 
         JPanel content = new JPanel(new BorderLayout(10, 10));
-        content.setBorder(new EmptyBorder(12, 12, 12, 12));
+        content.setBorder(new EmptyBorder(16, 16, 16, 16));
+        content.setBackground(SURFACE);
         dialog.setContentPane(content);
 
         // titolo
         JLabel title = new JLabel(data.getTitoloAnnuncio());
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
+        title.setFont(title.getFont().deriveFont(Font.BOLD, 18f));
+        title.setForeground(TITLE);
         content.add(title, BorderLayout.NORTH);
 
-        // info
-        JPanel info = new JPanel();
-        info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
+        // Info
+        JPanel body = new JPanel(new BorderLayout(0, 10));
+        body.setOpaque(false);
 
-        String tipo = (data.getTipologiaAnnuncio() == null || data.getTipologiaAnnuncio().isBlank())
-                ? "-"
-                : data.getTipologiaAnnuncio();
+        // Info list
+        JPanel infoList = new JPanel(new GridLayout(0, 1, 0, 4));
+        infoList.setOpaque(false);
 
-        info.add(new JLabel("Tipo annuncio: " + tipo));
-        info.add(new JLabel("Data offerta: " + safe(data.getDataOfferta())));
-        info.add(new JLabel((ricevuta ? "Offerente: " : "Venditore: ") + safe(data.getControparteDisplay())));
+        infoList.add(makeInfoLabel("Tipo annuncio: " + safe(data.getTipologiaAnnuncio())));
+        infoList.add(makeInfoLabel("Data offerta: " + safe(data.getDataOfferta())));
+        infoList.add(makeInfoLabel((ricevuta ? "Offerente: " : "Venditore: ") + safe(data.getControparteDisplay())));
 
         if (data.getImportoDisplay() != null) {
             String imp = data.getImportoDisplay().trim();
             if (!imp.isEmpty() && !imp.equals("-") && !imp.equals("- €")) {
-                info.add(new JLabel("Importo: " + imp));
-            }
+                infoList.add(makeInfoLabel("Importo: " + imp));
+                }
         }
 
         if (offerta.getOggettoOfferto() != null && !offerta.getOggettoOfferto().trim().isEmpty()) {
-            info.add(new JLabel("Oggetto offerto: " + offerta.getOggettoOfferto().trim()));
-        }
+            infoList.add(makeInfoLabel("Oggetto offerto: " + offerta.getOggettoOfferto().trim()));
+            }
 
-        info.add(Box.createVerticalStrut(8));
+        body.add(infoList, BorderLayout.NORTH);
 
+        // Messaggio
+        JPanel msgCard = new JPanel(new BorderLayout());
+        msgCard.setOpaque(true);
+        msgCard.setBackground(Color.WHITE);
+        msgCard.putClientProperty(FlatClientProperties.STYLE, CARD_STYLE);
+        msgCard.setBorder(new EmptyBorder(10, 10, 10, 10));
+        
+        
         JTextArea txtMsg = new JTextArea(offerta.getMessaggio() != null ? offerta.getMessaggio() : "-");
         txtMsg.setLineWrap(true);
         txtMsg.setWrapStyleWord(true);
         txtMsg.setEditable(false);
+        txtMsg.setOpaque(false);
+        txtMsg.setBorder(null);
+
         JScrollPane scr = new JScrollPane(txtMsg);
-        scr.setPreferredSize(new Dimension(520, 220));
+        scr.setPreferredSize(new Dimension(500, 180));
         scr.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scr.setBorder(null);
+        scr.setOpaque(false);
+        scr.getViewport().setOpaque(false);
 
-        JPanel center = new JPanel(new BorderLayout(8, 8));
-        center.add(info, BorderLayout.NORTH);
 
-        JPanel msgBox = new JPanel(new BorderLayout());
-        msgBox.setBorder(BorderFactory.createTitledBorder("Messaggio"));
-        msgBox.add(scr, BorderLayout.CENTER);
+        msgCard.add(scr, BorderLayout.CENTER);
+        body.add(msgCard, BorderLayout.CENTER);
 
-        center.add(msgBox, BorderLayout.CENTER);
+        content.add(body, BorderLayout.CENTER);
 
-        content.add(center, BorderLayout.CENTER);
-
-        // bottoni azione
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
+        // Actions
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        actions.setOpaque(false);
+        
+        
         JButton btnVedi = new JButton("Vedi annuncio");
+        styleSecondaryButton(btnVedi);
         btnVedi.addActionListener(e -> {
             dialog.dispose();
             if (ricevuta && ricevutaListener != null) {
@@ -409,66 +451,48 @@ public class NotificationView extends JPanel {
 
         if (ricevuta) {
             JButton btnAccetta = new JButton("Accetta");
-            btnAccetta.putClientProperty("JButton.buttonType", "default");
+            stylePrimaryButton(btnAccetta);
             btnAccetta.addActionListener(e -> {
                 dialog.dispose();
                 if (ricevutaListener != null) {
                     ricevutaListener.onAccetta(offerta);
-                } else {
-                    JOptionPane.showMessageDialog(this,
-                            "Azione 'Accetta' non collegata al controller.",
-                            "Info",
-                            JOptionPane.INFORMATION_MESSAGE);
                 }
             });
             actions.add(btnAccetta);
 
             JButton btnRifiuta = new JButton("Rifiuta");
-            btnRifiuta.setBackground(UITheme.ACCENT);
-            btnRifiuta.setForeground(Color.WHITE);
+            styleDangerButton(btnRifiuta);
             btnRifiuta.addActionListener(e -> {
                 dialog.dispose();
                 if (ricevutaListener != null) {
                     ricevutaListener.onRifiuta(offerta);
-                } else {
-                    JOptionPane.showMessageDialog(this,
-                            "Azione 'Rifiuta' non collegata al controller.",
-                            "Info",
-                            JOptionPane.INFORMATION_MESSAGE);
                 }
             });
             actions.add(btnRifiuta);
         } else {
             JButton btnModifica = new JButton("Modifica");
+            stylePrimaryButton(btnModifica);
             btnModifica.addActionListener(e -> {
                 dialog.dispose();
                 if (inviataListener != null) {
                     inviataListener.onModifica(offerta);
-                } else {
-                    JOptionPane.showMessageDialog(this,
-                            "Azione 'Modifica' non collegata al controller.",
-                            "Info",
-                            JOptionPane.INFORMATION_MESSAGE);
                 }
             });
             actions.add(btnModifica);
 
             JButton btnRitira = new JButton("Ritira");
+            styleDangerButton(btnRitira);
             btnRitira.addActionListener(e -> {
                 dialog.dispose();
                 if (inviataListener != null) {
                     inviataListener.onRitira(offerta);
-                } else {
-                    JOptionPane.showMessageDialog(this,
-                            "Azione 'Ritira' non collegata al controller.",
-                            "Info",
-                            JOptionPane.INFORMATION_MESSAGE);
                 }
             });
             actions.add(btnRitira);
         }
 
         JButton btnChiudi = new JButton("Chiudi");
+        btnChiudi.putClientProperty(FlatClientProperties.STYLE, "arc: 12;");
         btnChiudi.addActionListener(e -> dialog.dispose());
         actions.add(btnChiudi);
 
@@ -480,10 +504,47 @@ public class NotificationView extends JPanel {
     }
 
 
+    private JLabel makeInfoLabel(String text) {
+        JLabel l = new JLabel(text);
+        l.setForeground(TITLE);
+        return l;
+    }
+
+    private void stylePrimaryButton(JButton b) {
+        b.putClientProperty(FlatClientProperties.STYLE,
+                "arc: 12; background: #1B415D; foreground: #FFFFFF; " +
+                        "hoverBackground: #2A5E86; pressedBackground: #163245;");
+        b.setFocusable(false);
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        b.setBorderPainted(false);
+        b.setContentAreaFilled(true);
+    }
+
+    private void styleSecondaryButton(JButton b) {
+        b.putClientProperty(FlatClientProperties.STYLE,
+                "arc: 12; background: #D7E3F2; foreground: #1B415D; " +
+                        "hoverBackground: #C5D8EB; pressedBackground: #B0C9E0;");
+        b.setFocusable(false);
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        b.setBorderPainted(false);
+        b.setContentAreaFilled(true);
+    }
+
+    private void styleDangerButton(JButton b) {
+        b.putClientProperty(FlatClientProperties.STYLE,
+                "arc: 12; background: #D93C25; foreground: #FFFFFF; " +
+                        "hoverBackground: #B93522; pressedBackground: #8F2A1B;");
+        b.setFocusable(false);
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        b.setBorderPainted(false);
+        b.setContentAreaFilled(true);
+    }
+
+    
+    
     // RESPONSIVE HELPERS
     private int computeCols(int availableWidth) {
-        int contentW = availableWidth - 20; // margine approx
-        // CARD_W = 420
+        int contentW = availableWidth - 20;
         if (contentW < CARD_W)
             return 1;
         int cols = contentW / (CARD_W + HGAP);
@@ -491,10 +552,6 @@ public class NotificationView extends JPanel {
     }
 
     private void updateColsAndRelayout() {
-        if (ricevutePanel == null)
-            return;
-
-        Container parent = getParent();
         JScrollPane sp = null;
         for (Component c : getComponents()) {
             if (c instanceof JScrollPane) {
@@ -510,18 +567,10 @@ public class NotificationView extends JPanel {
         int newCols = computeCols(w);
         if (newCols != currentCols) {
             currentCols = newCols;
-            updatePanelLayout(ricevutePanel);
-            updatePanelLayout(inviatePanel);
-            updatePanelLayout(ricevuteAccettatePanel);
-            updatePanelLayout(inviateAccettatePanel);
-        }
-    }
-
-    private void updatePanelLayout(JPanel panel) {
-        if (panel != null) {
-            panel.setLayout(new GridLayout(0, currentCols, HGAP, VGAP));
-            panel.revalidate();
-            panel.repaint();
+            refreshRicevute();
+            refreshInviate();
+            refreshRicevuteAccettate();
+            refreshInviateAccettate();
         }
     }
 

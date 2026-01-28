@@ -2,10 +2,11 @@ package it.unina.uninaswap.view;
 
 import it.unina.uninaswap.model.entity.Annuncio;
 import it.unina.uninaswap.model.entity.Studente;
+import it.unina.uninaswap.util.UITheme;
+import com.formdev.flatlaf.FlatClientProperties;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,6 +16,15 @@ public class AnnuncioDetailView extends JPanel {
 
     private static final String PROFILE_M_PATH = "/images/menuIcons/profileM.png";
     private static final String PROFILE_F_PATH = "/images/menuIcons/profileF.png";
+
+
+    private static final Color SURFACE = Color.decode("#EAF2F9");
+    private static final Color SURFACE_2 = Color.decode("#F6FAFF");
+    private static final Color TITLE = UITheme.PRIMARY_DARK;
+    private static final Color SUBTLE = UITheme.TEXT_SECONDARY;
+
+    private static final String CARD_STYLE = "arc: 20; background: #FFFFFF; border: 1,1,1,1,#D7E3F2;";
+    private static final String SECTION_STYLE = "arc: 18; background: #F6FAFF; border: 1,1,1,1,#D7E3F2;";
 
     private JButton btnBack;
 
@@ -62,135 +72,226 @@ public class AnnuncioDetailView extends JPanel {
 
     public AnnuncioDetailView() {
         setLayout(new BorderLayout());
+        setBackground(SURFACE);
 
         // TOP BAR
         JPanel topBar = new JPanel(new BorderLayout());
+        topBar.setOpaque(false);
         topBar.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         btnBack = new JButton("← Indietro");
+        btnBack.setFont(btnBack.getFont().deriveFont(Font.BOLD, 14f));
+        btnBack.setForeground(TITLE);
+        btnBack.setBorderPainted(false);
+        btnBack.setContentAreaFilled(false);
+        btnBack.setFocusPainted(false);
+        btnBack.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         topBar.add(btnBack, BorderLayout.WEST);
 
-        JLabel titoloPagina = new JLabel("Dettaglio annuncio");
-        titoloPagina.setFont(titoloPagina.getFont().deriveFont(Font.BOLD, 16f));
+        JLabel titoloPagina = new JLabel("Dettaglio annuncio", SwingConstants.CENTER);
+        titoloPagina.setFont(titoloPagina.getFont().deriveFont(Font.BOLD, 18f));
+        titoloPagina.setForeground(TITLE);
         topBar.add(titoloPagina, BorderLayout.CENTER);
 
+        
+        topBar.add(Box.createHorizontalStrut(100), BorderLayout.EAST);
+        
         add(topBar, BorderLayout.NORTH);
 
         // AREA SCROLLABILE
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setBorder(new EmptyBorder(10, 18, 18, 18));
-
+        content.setBorder(new EmptyBorder(10, 20, 20, 20));
+        content.setBackground(SURFACE);
+        
         JScrollPane scroll = new JScrollPane(content);
         scroll.setBorder(null);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.getViewport().setBackground(SURFACE);
+        scroll.setBackground(SURFACE);
         add(scroll, BorderLayout.CENTER);
 
         
         // SEZIONE FOTO
-        JPanel fotoSection = new JPanel(new BorderLayout());
-        fotoSection.setBorder(new TitledBorder("Foto"));
+        JPanel fotoSection = buildSection("Foto");
+
+        JPanel fotoContent = new JPanel(new BorderLayout());
+        fotoContent.setOpaque(false);
 
         lblMainPhoto = new JLabel();
         lblMainPhoto.setHorizontalAlignment(SwingConstants.CENTER);
         lblMainPhoto.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        fotoSection.add(lblMainPhoto, BorderLayout.CENTER);
+        fotoContent.add(lblMainPhoto, BorderLayout.CENTER);
 
         thumbnailsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
-        fotoSection.add(thumbnailsPanel, BorderLayout.SOUTH);
-
+        thumbnailsPanel.setOpaque(false);
+        fotoContent.add(thumbnailsPanel, BorderLayout.SOUTH);
+        
+        fotoSection.add(fotoContent, BorderLayout.CENTER);
         content.add(fotoSection);
-        content.add(Box.createVerticalStrut(12));
+        content.add(Box.createVerticalStrut(20));
 
         
         // SEZIONE DETTAGLI + DESCRIZIONE
-        JPanel infoSection = new JPanel(new BorderLayout());
-        infoSection.setBorder(new TitledBorder("Dettagli annuncio"));
+        JPanel infoSection = buildSection("Dettagli annuncio");
+        
+        JPanel infoContainer = new JPanel(new BorderLayout(0, 16));
+        infoContainer.setOpaque(false);
+        
 
-        JPanel infoLeft = new JPanel(new GridLayout(0, 1, 0, 6));
-        infoLeft.setBorder(new EmptyBorder(8, 8, 8, 8));
+        //info
+        JPanel infoCard = new JPanel(new GridLayout(0, 1, 0, 8));
+        infoCard.setOpaque(true);
+        infoCard.setBackground(Color.WHITE);
+        infoCard.putClientProperty(FlatClientProperties.STYLE, CARD_STYLE);
+        infoCard.setBorder(new EmptyBorder(14, 16, 14, 16));
 
         lblTitolo = new JLabel("Titolo: -");
-        lblTitolo.setFont(lblTitolo.getFont().deriveFont(Font.BOLD, 14f));
+        lblTitolo.setFont(lblTitolo.getFont().deriveFont(Font.BOLD, 15f));
+        lblTitolo.setBackground(TITLE);
 
         lblPrezzo = new JLabel("Prezzo: -");
+        lblPrezzo.setForeground(TITLE);
+        
         lblDataPubblicazione = new JLabel("Data pubblicazione: -");
+        lblDataPubblicazione.setForeground(SUBTLE);
+        
         lblTipologia = new JLabel("Tipologia: -");
+        lblTipologia.setForeground(SUBTLE);
+        
         lblCategoria = new JLabel("Categoria: -");
+        lblCategoria.setForeground(SUBTLE);
+        
         lblOggettoRichiesto = new JLabel("Oggetto richiesto: -");
+        lblOggettoRichiesto.setForeground(TITLE);
+        
         lblConsegna = new JLabel("Consegna: -");
+        lblConsegna.setForeground(TITLE);
 
-        infoLeft.add(lblTitolo);
-        infoLeft.add(lblPrezzo);
-        infoLeft.add(lblDataPubblicazione);
-        infoLeft.add(lblTipologia);
-        infoLeft.add(lblCategoria);
-        infoLeft.add(lblOggettoRichiesto);
-        infoLeft.add(lblConsegna);
+        infoCard.add(lblTitolo);
+        infoCard.add(lblPrezzo);
+        infoCard.add(lblDataPubblicazione);
+        infoCard.add(lblTipologia);
+        infoCard.add(lblCategoria);
+        infoCard.add(lblOggettoRichiesto);
+        infoCard.add(lblConsegna);
 
-        infoSection.add(infoLeft, BorderLayout.WEST);
+        infoSection.add(infoCard, BorderLayout.NORTH);
 
         // riquadro descrizione
         JPanel descrPanel = new JPanel(new BorderLayout());
-        descrPanel.setBorder(new TitledBorder("Descrizione"));
+        descrPanel.setOpaque(false);
+        
+        JLabel lblDescTitle = new JLabel("Descrizione");
+        lblDescTitle.setFont(lblDescTitle.getFont().deriveFont(Font.BOLD, 14f));
+        lblDescTitle.setForeground(TITLE);
+        lblDescTitle.setBorder(new EmptyBorder(0, 4, 6, 0));
+        descrPanel.add(lblDescTitle, BorderLayout.NORTH);
+
+        JPanel descrCard = new JPanel(new BorderLayout());
+        descrCard.setOpaque(true);
+        descrCard.setBackground(Color.WHITE);
+        descrCard.putClientProperty(FlatClientProperties.STYLE, CARD_STYLE);
+        descrCard.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         txtDescrizione = new JTextArea(6, 25);
         txtDescrizione.setLineWrap(true);
         txtDescrizione.setWrapStyleWord(true);
         txtDescrizione.setEditable(false);
+        txtDescrizione.setOpaque(false);
+        txtDescrizione.setBorder(null);
 
         JScrollPane scrDesc = new JScrollPane(txtDescrizione);
         scrDesc.setBorder(null);
         scrDesc.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        descrPanel.add(scrDesc, BorderLayout.CENTER);
+        scrDesc.setOpaque(false);
+        scrDesc.getViewport().setOpaque(false);
+        
+        descrCard.add(scrDesc, BorderLayout.CENTER);
+        descrPanel.add(descrCard, BorderLayout.CENTER);
 
-        infoSection.add(descrPanel, BorderLayout.CENTER);
-
+        infoContainer.add(descrPanel, BorderLayout.CENTER);
+        infoSection.add(infoContainer, BorderLayout.CENTER);
+        
         content.add(infoSection);
-        content.add(Box.createVerticalStrut(12));
+        content.add(Box.createVerticalStrut(20));
 
         
         // SEZIONE VENDITORE
-        JPanel venditoreSection = new JPanel(new BorderLayout());
-        venditoreSection.setBorder(new TitledBorder("Venditore"));
+        JPanel venditoreSection = buildSection("Venditore");
 
-        JPanel left = new JPanel();
-        left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
-        left.setBorder(new EmptyBorder(10, 10, 10, 10));
+        JPanel venditoreCard = new JPanel(new BorderLayout());
+        venditoreCard.setOpaque(true);
+        venditoreCard.setBackground(Color.WHITE);
+        venditoreCard.putClientProperty(FlatClientProperties.STYLE, CARD_STYLE);
+        venditoreCard.setBorder(new EmptyBorder(14, 14, 14, 14));
+
+        JPanel vLeft = new JPanel();
+        vLeft.setLayout(new BoxLayout(vLeft, BoxLayout.Y_AXIS));
+        vLeft.setOpaque(false);
 
         lblVenditoreFoto = new JLabel();
         lblVenditoreFoto.setAlignmentX(Component.LEFT_ALIGNMENT);
         setVenditoreFotoDefault(null); // default iniziale
 
-        left.add(lblVenditoreFoto);
-        left.add(Box.createVerticalStrut(8));
+        vLeft.add(lblVenditoreFoto);
+        vLeft.add(Box.createVerticalStrut(8));
 
         lblVenditoreNome = new JLabel("Nome: -");
+        lblVenditoreNome.setForeground(TITLE);
+        lblVenditoreNome.setFont(lblVenditoreNome.getFont().deriveFont(Font.BOLD, 14f));
+        
         lblVenditoreEmail = new JLabel("Email: -");
+        lblVenditoreEmail.setForeground(SUBTLE);
+        
         lblVenditoreMatricola = new JLabel("Matricola: -");
+        lblVenditoreMatricola.setForeground(SUBTLE);
 
-        left.add(lblVenditoreNome);
-        left.add(lblVenditoreEmail);
-        left.add(lblVenditoreMatricola);
+        vLeft.add(lblVenditoreNome);
+        vLeft.add(lblVenditoreEmail);
+        vLeft.add(lblVenditoreMatricola);
 
-        venditoreSection.add(left, BorderLayout.CENTER);
+        venditoreCard.add(vLeft, BorderLayout.CENTER);
 
         btnVediProfiloVenditore = new JButton("Vedi profilo venditore");
-        venditoreSection.add(btnVediProfiloVenditore, BorderLayout.SOUTH);
+        styleSecondaryButton(btnVediProfiloVenditore);
 
+        JPanel btnWrap = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnWrap.setOpaque(false);
+        btnWrap.add(btnVediProfiloVenditore);
+
+        venditoreCard.add(btnWrap, BorderLayout.SOUTH);
+
+        venditoreSection.add(venditoreCard, BorderLayout.CENTER);
+        
+        
         content.add(venditoreSection);
+        content.add(Box.createVerticalStrut(20));
 
 
         // SEZIONE AZIONI (offerte)
-        azioniPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        azioniPanel.setBorder(new TitledBorder("Azioni"));
+        JPanel azioniSection = buildSection("Azioni");
+
+        azioniPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        azioniPanel.setOpaque(false);
+
 
         btnAcquista = new JButton("Acquista");
-        btnFaiOfferta = new JButton("Fai offerta");
-        btnRichiediRegalo = new JButton("Richiedi");
-        btnProponiScambio = new JButton("Proponi scambio");
+        stylePrimaryButton(btnAcquista);
 
+        btnFaiOfferta = new JButton("Fai offerta");
+        stylePrimaryButton(btnFaiOfferta);
+
+        btnRichiediRegalo = new JButton("Richiedi");
+        stylePrimaryButton(btnRichiediRegalo);
+
+        btnProponiScambio = new JButton("Proponi scambio");
+        stylePrimaryButton(btnProponiScambio);
+
+        
+        
         btnAcquista.addActionListener(e -> {
             if (annuncioOffertaListener != null && currentAnnuncio != null)
                 annuncioOffertaListener.onOffertaAction(currentAnnuncio, OffertaAction.ACQUISTA);
@@ -213,10 +314,51 @@ public class AnnuncioDetailView extends JPanel {
         azioniPanel.add(btnRichiediRegalo);
         azioniPanel.add(btnProponiScambio);
 
-        content.add(azioniPanel);
-
+        
+        azioniSection.add(azioniPanel, BorderLayout.CENTER);
+        content.add(azioniSection);
     }
 
+    // Helpers Style
+    private JPanel buildSection(String title) {
+        JPanel section = new JPanel(new BorderLayout());
+        section.setOpaque(true);
+        section.setBackground(SURFACE_2);
+        section.putClientProperty(FlatClientProperties.STYLE, SECTION_STYLE);
+        section.setBorder(new EmptyBorder(12, 12, 12, 12));
+
+        JLabel lbl = new JLabel(title);
+        lbl.setForeground(TITLE);
+        lbl.setFont(lbl.getFont().deriveFont(Font.BOLD, 16f));
+        lbl.setBorder(new EmptyBorder(0, 2, 10, 2));
+        section.add(lbl, BorderLayout.NORTH);
+
+        return section;
+    }
+
+    private void stylePrimaryButton(JButton b) {
+        b.putClientProperty(FlatClientProperties.STYLE,
+                "arc: 12; " +
+                        "background: #1B415D; foreground: #FFFFFF; " +
+                        "hoverBackground: #2A5E86; pressedBackground: #163245;");
+        b.setFocusable(false);
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        b.setBorderPainted(false);
+        b.setContentAreaFilled(true);
+    }
+
+    private void styleSecondaryButton(JButton b) {
+        b.putClientProperty(FlatClientProperties.STYLE,
+                "arc: 12; " +
+                        "background: #D7E3F2; foreground: #1B415D; " +
+                        "hoverBackground: #C5D8EB; pressedBackground: #B0C9E0;");
+        b.setFocusable(false);
+        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        b.setBorderPainted(false);
+    }
+    
+    
+    
     public void setData(Annuncio annuncio, Studente venditore, List<ImageIcon> foto) {
         this.currentAnnuncio = annuncio;
         this.currentVenditore = venditore;
@@ -322,9 +464,18 @@ public class AnnuncioDetailView extends JPanel {
             path = PROFILE_M_PATH;
         }
 
-        ImageIcon def = new ImageIcon(getClass().getResource(path));
-        Image scaled = def.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
-        lblVenditoreFoto.setIcon(new ImageIcon(scaled));
+        try {
+            java.net.URL url = getClass().getResource(path);
+            if (url == null) {
+                lblVenditoreFoto.setIcon(null);
+                return;
+            }
+            ImageIcon def = new ImageIcon(url);
+            Image scaled = def.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH);
+            lblVenditoreFoto.setIcon(new ImageIcon(scaled));
+        } catch (Exception e) {
+            lblVenditoreFoto.setIcon(null);
+        }
     }
 
     private ImageIcon getDefaultIconForCategoria(String categoria) {
@@ -360,9 +511,11 @@ public class AnnuncioDetailView extends JPanel {
                 && currentAnnuncio.getMatricolaVenditore() != null
                 && matricolaLoggedIn.equals(currentAnnuncio.getMatricolaVenditore()));
 
-        azioniPanel.setVisible(!isMine);
-        if (isMine)
+        if (isMine) {
+            azioniPanel.setVisible(false);
             return;
+        }
+        azioniPanel.setVisible(true);
 
         // nascondo tutto e poi mostro solo quello giusto
         btnAcquista.setVisible(false);

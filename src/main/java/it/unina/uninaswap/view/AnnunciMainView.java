@@ -20,6 +20,9 @@ public class AnnunciMainView extends JFrame {
 
     private JPanel topBar;
 
+    private JPanel topBarPanelWest;
+    private JPanel topBarPanelEast;
+
     private CardLayout centerLayout;
     private JPanel centerPanel;
 
@@ -41,6 +44,12 @@ public class AnnunciMainView extends JFrame {
 
     private static final Color PRIMARY = UITheme.PRIMARY;
     private static final Color SURFACE = Color.decode("#EAF2F9");
+
+    private static final int TOP_ICON_PX = 50;
+    private static final int TOP_BUTTON_PX = 70;
+
+    private static final int MENU_WRAP_LEFT_PAD = 10;
+    private static final int FILTER_WRAP_RIGHT_PAD = 10;
 
     public AnnunciMainView(Studente studenteLoggato) {
         setTitle("UniNaSwap");
@@ -69,11 +78,11 @@ public class AnnunciMainView extends JFrame {
         getContentPane().add(topBar, BorderLayout.NORTH);
 
         // West (hamburger)
-        JPanel topBarPanelWest = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 2));
+        topBarPanelWest = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         topBarPanelWest.setOpaque(false);
         topBar.add(topBarPanelWest, BorderLayout.WEST);
 
-        hamburgerMenuButton = createTopIconButton("/images/menuIcons/hamburgerMenu.png", 36);
+        hamburgerMenuButton = createTopIconButton("/images/menuIcons/hamburgerMenu.png", TOP_ICON_PX, TOP_BUTTON_PX);
         topBarPanelWest.add(hamburgerMenuButton);
 
         // Center (logo)
@@ -97,18 +106,18 @@ public class AnnunciMainView extends JFrame {
         } catch (Exception ignored) {}
 
         // East (filter)
-        JPanel topBarPanelEast = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 2));
+        topBarPanelEast = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         topBarPanelEast.setOpaque(false);
         topBar.add(topBarPanelEast, BorderLayout.EAST);
 
-        filterButton = createTopIconButton("/images/menuIcons/filter.png", 36);
+        filterButton = createTopIconButton("/images/menuIcons/filter.png", TOP_ICON_PX, TOP_BUTTON_PX);
         topBarPanelEast.add(filterButton);
 
         //MENU LATERALE 
         menuBar = new AnnunciMenuPanel();
         JPanel menuWrap = new JPanel(new BorderLayout());
         menuWrap.setBackground(SURFACE);
-        menuWrap.setBorder(new EmptyBorder(10, 10, 10, 0));
+        menuWrap.setBorder(new EmptyBorder(10, MENU_WRAP_LEFT_PAD, 10, 0));
         menuWrap.add(menuBar, BorderLayout.CENTER);
         getContentPane().add(menuWrap, BorderLayout.WEST);
 
@@ -116,7 +125,7 @@ public class AnnunciMainView extends JFrame {
         filterPanel = new AnnunciFilterPanel();
         JPanel filterWrap = new JPanel(new BorderLayout());
         filterWrap.setBackground(SURFACE);
-        filterWrap.setBorder(new EmptyBorder(10, 0, 10, 10));
+        filterWrap.setBorder(new EmptyBorder(10, 0, 10, FILTER_WRAP_RIGHT_PAD));
         filterWrap.add(filterPanel, BorderLayout.CENTER);
         getContentPane().add(filterWrap, BorderLayout.EAST);
 
@@ -156,16 +165,24 @@ public class AnnunciMainView extends JFrame {
                 resizeSidePanels();
             }
         });
+        
+        SwingUtilities.invokeLater(this::resizeSidePanels);
     }
 
-    private JButton createTopIconButton(String resourcePath, int iconSizePx) {
+    private JButton createTopIconButton(String resourcePath, int iconSizePx, int buttonSizePx) {
         JButton b = new JButton();
+        
+        b.setPreferredSize(new Dimension(buttonSizePx, buttonSizePx));
+        b.setMinimumSize(new Dimension(buttonSizePx, buttonSizePx));
+        b.setMaximumSize(new Dimension(buttonSizePx, buttonSizePx));
+        
+        
         b.setOpaque(false);
         b.setContentAreaFilled(false);
         b.setBorderPainted(false);
         b.setFocusPainted(false);
         b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        b.setBorder(new EmptyBorder(6, 8, 6, 8));
+        b.setBorder(new EmptyBorder(0, 0, 0, 0));
 
         try {
             ImageIcon raw = new ImageIcon(getClass().getResource(resourcePath));
@@ -194,18 +211,22 @@ public class AnnunciMainView extends JFrame {
     private void resizeSidePanels() {
         int w = getWidth();
 
+        // menu laterale
         int menuW = (int) (w * 0.18);
         menuW = Math.max(180, Math.min(260, menuW));
         if (menuBar != null) {
             menuBar.setPreferredSize(new Dimension(menuW, 0));
         }
 
+        // filtro laterale
         int filterW = (int) (w * 0.22);
         filterW = Math.max(240, Math.min(320, filterW));
         if (filterPanel != null) {
             filterPanel.setPreferredSize(new Dimension(filterW, 0));
         }
 
+        topBar.revalidate();
+        topBar.repaint();
         revalidate();
     }
 

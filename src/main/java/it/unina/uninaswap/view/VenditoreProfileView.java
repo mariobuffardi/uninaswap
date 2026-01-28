@@ -33,7 +33,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
+import com.formdev.flatlaf.FlatClientProperties;
 
 import it.unina.uninaswap.model.entity.Annuncio;
 import it.unina.uninaswap.model.entity.Studente;
@@ -43,8 +43,8 @@ import it.unina.uninaswap.util.UITheme;
 public class VenditoreProfileView extends JPanel {
 
 
-    private static final int CARD_W = 280;
-    private static final int CARD_H = 310;
+    private static final int CARD_W = 260;
+    private static final int CARD_H = 280;
     private static final int HGAP = 15;
     private static final int VGAP = 5;
 
@@ -52,6 +52,17 @@ public class VenditoreProfileView extends JPanel {
     private static final int REC_CARD_H = 220;
 
     private static final String STAR_PATH = "/images/altro/star.jpg";
+    
+    private static final Color SURFACE = Color.decode("#EAF2F9");
+    private static final Color SURFACE_2 = Color.decode("#F6FAFF");
+
+    private static final Color TITLE = UITheme.PRIMARY_DARK;
+    private static final Color SUBTLE = UITheme.TEXT_SECONDARY;
+
+    private static final String CARD_STYLE = "arc: 20; background: #FFFFFF; border: 1,1,1,1,#D7E3F2;";
+
+    private static final String SECTION_STYLE = "arc: 18; background: #F6FAFF; border: 1,1,1,1,#D7E3F2;";
+
 
     private JButton btnBack;
 
@@ -86,30 +97,46 @@ public class VenditoreProfileView extends JPanel {
 
     public VenditoreProfileView() {
         setLayout(new BorderLayout());
+        setBackground(SURFACE);
 
         // TOP BAR 
         JPanel top = new JPanel(new BorderLayout());
+        top.setOpaque(false);
         top.setBorder(new EmptyBorder(10, 12, 10, 12));
 
         btnBack = new JButton("← Indietro");
+        // Stile semplice per il back button
+        btnBack.setFont(btnBack.getFont().deriveFont(Font.BOLD, 14f));
+        btnBack.setForeground(TITLE);
+        btnBack.setBorderPainted(false);
+        btnBack.setContentAreaFilled(false);
+        btnBack.setFocusPainted(false);
+        btnBack.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
         top.add(btnBack, BorderLayout.WEST);
 
         JLabel title = new JLabel("Profilo venditore", SwingConstants.CENTER);
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 16f));
+        title.setForeground(TITLE);
+        title.setFont(title.getFont().deriveFont(Font.BOLD, 18f));
         top.add(title, BorderLayout.CENTER);
 
-        top.add(Box.createHorizontalStrut(80), BorderLayout.EAST);
+
+        Component spacer = Box.createHorizontalStrut(100);
+        top.add(spacer, BorderLayout.EAST);
         add(top, BorderLayout.NORTH);
 
         // CONTENUTO SCROLLABILE 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        mainPanel.setBorder(new EmptyBorder(10, 20, 20, 20));
+        mainPanel.setBackground(SURFACE);
 
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getViewport().setBackground(SURFACE);
+        scrollPane.setBackground(SURFACE);
         add(scrollPane, BorderLayout.CENTER);
 
         // FOTO
@@ -120,61 +147,85 @@ public class VenditoreProfileView extends JPanel {
 
         // titolo info
         JLabel lblTitoloInfo = new JLabel("Informazioni venditore");
+        lblTitoloInfo.setForeground(TITLE);
         lblTitoloInfo.setFont(lblTitoloInfo.getFont().deriveFont(Font.BOLD, 18f));
         lblTitoloInfo.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(lblTitoloInfo);
         mainPanel.add(Box.createVerticalStrut(10));
 
         // info panel
-        JPanel infoPanel = new JPanel(new GridLayout(0, 1, 0, 6));
-        infoPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JPanel infoCard = new JPanel(new BorderLayout());
+        infoCard.setOpaque(true);
+        infoCard.setBackground(Color.WHITE);
+        infoCard.putClientProperty(FlatClientProperties.STYLE, CARD_STYLE);
+        infoCard.setAlignmentX(Component.CENTER_ALIGNMENT);
+        infoCard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
+        infoCard.setBorder(new EmptyBorder(14, 16, 14, 16));
 
+        JPanel infoPanel = new JPanel(new GridLayout(0, 1, 0, 6));
+        infoPanel.setOpaque(false);
+        
+        
         lblNomeCompleto = new JLabel("Nome: -");
         lblEmail = new JLabel("Email: -");
         lblMatricola = new JLabel("Matricola: -");
         lblPreferenze = new JLabel("Preferenze consegna: -");
 
+
+        styleInfoLabel(lblNomeCompleto);
+        styleInfoLabel(lblEmail);
+        styleInfoLabel(lblMatricola);
+        styleInfoLabel(lblPreferenze);
+
+        
         infoPanel.add(lblNomeCompleto);
         infoPanel.add(lblEmail);
         infoPanel.add(lblMatricola);
         infoPanel.add(lblPreferenze);
 
-        mainPanel.add(infoPanel);
-        mainPanel.add(Box.createVerticalStrut(18));
+        infoCard.add(infoPanel, BorderLayout.CENTER);
+
+        mainPanel.add(infoCard);
+        mainPanel.add(Box.createVerticalStrut(20));
 
         // SEZIONE ANNUNCI VENDITORE 
-        JPanel annunciSection = new JPanel(new BorderLayout());
-        annunciSection.setBorder(new TitledBorder("Annunci del venditore"));
+        JPanel annunciSection = buildSection("Annunci del venditore");
 
-        annunciPreviewPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, HGAP, VGAP));
-        annunciPreviewPanel.setBorder(new EmptyBorder(8, 8, 8, 8));
+        annunciPreviewPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, HGAP, VGAP));
+        annunciPreviewPanel.setOpaque(false);
+        annunciPreviewPanel.setBorder(new EmptyBorder(6, 6, 6, 6));
 
         // Scroll orizzontale
         JScrollPane annScroll = new JScrollPane(annunciPreviewPanel);
         annScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         annScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         annScroll.setBorder(null);
-        annScroll.setPreferredSize(new Dimension(0, CARD_H + 30));
-
+        annScroll.getViewport().setOpaque(false);
+        annScroll.setOpaque(false);
+        annScroll.setPreferredSize(new Dimension(0, CARD_H + 34));
+        
         annunciSection.add(annScroll, BorderLayout.CENTER);
 
         mainPanel.add(annunciSection);
         mainPanel.add(Box.createVerticalStrut(20));
 
         // SEZIONE RECENSIONI VENDITORE 
-        JPanel recensioniSection = new JPanel(new BorderLayout());
-        recensioniSection.setBorder(new TitledBorder("Recensioni del venditore"));
+        JPanel recensioniSection = buildSection("Recensioni del venditore");
 
-        recensioniPreviewPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, HGAP, VGAP));
-        recensioniPreviewPanel.setBorder(new EmptyBorder(8, 8, 8, 8));
+        recensioniPreviewPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, HGAP, VGAP));
+        recensioniPreviewPanel.setOpaque(false);
+        recensioniPreviewPanel.setBorder(new EmptyBorder(6, 6, 6, 6));
 
         // Scroll orizzontale recensioni
         JScrollPane recScroll = new JScrollPane(recensioniPreviewPanel);
         recScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         recScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         recScroll.setBorder(null);
-        recScroll.setPreferredSize(new Dimension(0, REC_CARD_H + 30));
-
+        recScroll.getViewport().setOpaque(false);
+        recScroll.setOpaque(false);
+        recScroll.setPreferredSize(new Dimension(0, REC_CARD_H + 34));
+        
+        
         recensioniSection.add(recScroll, BorderLayout.CENTER);
         mainPanel.add(recensioniSection);
 
@@ -183,6 +234,28 @@ public class VenditoreProfileView extends JPanel {
         setAnnunciVenditore(null);
         setRecensioniVenditore(null);
     }
+    
+    private void styleInfoLabel(JLabel l) {
+        l.setForeground(TITLE);
+        l.setFont(l.getFont().deriveFont(Font.PLAIN, 13.5f));
+    }
+
+    private JPanel buildSection(String title) {
+        JPanel section = new JPanel(new BorderLayout());
+        section.setOpaque(true);
+        section.setBackground(SURFACE_2);
+        section.putClientProperty(FlatClientProperties.STYLE, SECTION_STYLE);
+        section.setBorder(new EmptyBorder(12, 12, 12, 12));
+
+        JLabel lbl = new JLabel(title);
+        lbl.setForeground(TITLE);
+        lbl.setFont(lbl.getFont().deriveFont(Font.BOLD, 16f));
+        lbl.setBorder(new EmptyBorder(0, 2, 10, 2));
+        section.add(lbl, BorderLayout.NORTH);
+
+        return section;
+    }
+
 
     // API controller 
     public void setVenditore(Studente venditore) {
@@ -228,6 +301,7 @@ public class VenditoreProfileView extends JPanel {
 
         if (annunciVenditore.isEmpty()) {
             JLabel lbl = new JLabel("Nessun annuncio trovato.", SwingConstants.CENTER);
+            lbl.setForeground(SUBTLE);
             lbl.setBorder(new EmptyBorder(25, 10, 10, 10));
             annunciPreviewPanel.add(lbl);
         } else {
@@ -242,10 +316,10 @@ public class VenditoreProfileView extends JPanel {
 
     private JPanel createAnnuncioCard(Annuncio annuncio) {
         JPanel card = new JPanel(new BorderLayout());
-        card.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(UITheme.PRIMARY, 2, true),
-                new EmptyBorder(14, 14, 14, 14)));
+        card.setOpaque(true);
         card.setBackground(Color.WHITE);
+        card.putClientProperty(FlatClientProperties.STYLE, CARD_STYLE);
+        card.setBorder(new EmptyBorder(0, 0, 0, 0));
 
         Dimension fixed = new Dimension(CARD_W, CARD_H);
         card.setPreferredSize(fixed);
@@ -253,9 +327,16 @@ public class VenditoreProfileView extends JPanel {
         card.setMaximumSize(fixed);
 
         // FOTO PRINCIPALE (larger)
+
+        JPanel photoWrap = new JPanel(new BorderLayout());
+        photoWrap.setOpaque(false);
+        photoWrap.setBorder(new EmptyBorder(10, 12, 4, 12));
         JLabel lblFoto = new JLabel();
         lblFoto.setHorizontalAlignment(SwingConstants.CENTER);
-        lblFoto.setBorder(new EmptyBorder(0, 0, 10, 0));
+        lblFoto.setOpaque(true);
+        lblFoto.setBackground(SURFACE_2);
+        lblFoto.putClientProperty(FlatClientProperties.STYLE, "arc: 16;");
+
 
         String fotoNomeFile = annuncio.getFotoPrincipalePath();
         ImageIcon baseIcon = ImageUtil.annuncioImageFromDbPath(fotoNomeFile);
@@ -263,39 +344,42 @@ public class VenditoreProfileView extends JPanel {
             baseIcon = ImageUtil.defaultForCategoria(annuncio.getCategoria());
 
         String key = (fotoNomeFile != null ? fotoNomeFile : "cat_" + annuncio.getCategoria());
-        ImageIcon icon = ImageUtil.scaled(baseIcon, 140, 140);
+        ImageIcon icon = ImageUtil.scaled(baseIcon, 130, 130);
 
         lblFoto.setIcon(icon);
-        card.add(lblFoto, BorderLayout.NORTH);
 
-        // INFO
-        JPanel info = new JPanel();
-        info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
-        info.setBorder(new EmptyBorder(6, 0, 10, 0));
-        info.setOpaque(false);
+        
+        photoWrap.add(lblFoto, BorderLayout.CENTER);
+        card.add(photoWrap, BorderLayout.NORTH);
+
+        // INFO 
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setOpaque(false);
+        infoPanel.setBorder(new EmptyBorder(4, 14, 6, 14));
 
         JLabel lblTitolo = new JLabel(annuncio.getTitolo());
-        lblTitolo.setFont(lblTitolo.getFont().deriveFont(Font.BOLD, 16f));
-        lblTitolo.setForeground(UITheme.PRIMARY_DARK);
-        info.add(lblTitolo);
+        lblTitolo.setFont(lblTitolo.getFont().deriveFont(Font.BOLD, 15.5f));
+        lblTitolo.setForeground(TITLE);
+        infoPanel.add(lblTitolo);
 
-        info.add(Box.createVerticalStrut(6));
+        infoPanel.add(Box.createVerticalStrut(6));
 
         JLabel lblTipo = new JLabel(annuncio.getTipologia() + " • " + annuncio.getCategoria());
-        lblTipo.setForeground(UITheme.TEXT_SECONDARY);
-        lblTipo.setFont(lblTipo.getFont().deriveFont(11f));
-        info.add(lblTipo);
+        lblTipo.setForeground(SUBTLE);
+        lblTipo.setFont(lblTipo.getFont().deriveFont(11.3f));
+        infoPanel.add(lblTipo);
 
         BigDecimal prezzo = annuncio.getPrezzo();
         if (prezzo != null) {
-            info.add(Box.createVerticalStrut(6));
+            infoPanel.add(Box.createVerticalStrut(6));
             JLabel lblPrezzo = new JLabel("€ " + prezzo.toPlainString());
-            lblPrezzo.setForeground(UITheme.PRIMARY_DARK);
-            lblPrezzo.setFont(lblPrezzo.getFont().deriveFont(Font.BOLD, 16f));
-            info.add(lblPrezzo);
+            lblPrezzo.setForeground(TITLE);
+            lblPrezzo.setFont(lblPrezzo.getFont().deriveFont(Font.BOLD, 15.5f));
+            infoPanel.add(lblPrezzo);
         }
 
-        card.add(info, BorderLayout.CENTER);
+        card.add(infoPanel, BorderLayout.CENTER);
 
         // CLICK -> dettaglio
         card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -304,6 +388,20 @@ public class VenditoreProfileView extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (annuncioClickListener != null)
                     annuncioClickListener.onAnnuncioClick(annuncio);
+            }
+            
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                card.putClientProperty(FlatClientProperties.STYLE,
+                        "arc: 20; background: #FFFFFF; border: 1,1,1,1,#BFD3EA;");
+                card.repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                card.putClientProperty(FlatClientProperties.STYLE, CARD_STYLE);
+                card.repaint();
             }
         });
 
@@ -327,9 +425,20 @@ public class VenditoreProfileView extends JPanel {
             defaultPath = "/images/menuIcons/profileM.png";
         }
 
-        ImageIcon def = new ImageIcon(getClass().getResource(defaultPath));
-        Image scaled = def.getImage().getScaledInstance(sizePx, sizePx, Image.SCALE_SMOOTH);
-        lblFotoProfilo.setIcon(new ImageIcon(scaled));
+        
+        
+        try {
+            java.net.URL url = getClass().getResource(defaultPath);
+            if (url == null) {
+                lblFotoProfilo.setIcon(null);
+                return;
+            }
+            ImageIcon def = new ImageIcon(url);
+            Image scaled = def.getImage().getScaledInstance(sizePx, sizePx, Image.SCALE_SMOOTH);
+            lblFotoProfilo.setIcon(new ImageIcon(scaled));
+        } catch (Exception e) {
+            lblFotoProfilo.setIcon(null);
+        }
     }
 
     public void setRecensioniVenditore(List<ProfileView.RecensioneCardData> recensioni) {
@@ -346,6 +455,7 @@ public class VenditoreProfileView extends JPanel {
 
         if (recensioniVenditore.isEmpty()) {
             JLabel lbl = new JLabel("Nessuna recensione trovata.", SwingConstants.CENTER);
+            lbl.setForeground(SUBTLE);
             lbl.setBorder(new EmptyBorder(25, 10, 10, 10));
             recensioniPreviewPanel.add(lbl);
         } else {
@@ -360,8 +470,10 @@ public class VenditoreProfileView extends JPanel {
 
     private JPanel createRecensioneCard(ProfileView.RecensioneCardData r) {
         JPanel card = new JPanel(new BorderLayout());
-        card.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
+        card.setOpaque(true);        
         card.setBackground(Color.WHITE);
+        card.putClientProperty(FlatClientProperties.STYLE, CARD_STYLE);
+        card.setBorder(new EmptyBorder(0, 0, 0, 0));
 
         Dimension fixed = new Dimension(REC_CARD_W, REC_CARD_H);
         card.setPreferredSize(fixed);
@@ -370,15 +482,17 @@ public class VenditoreProfileView extends JPanel {
 
         // TOP
         JPanel top = new JPanel();
-        top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
-        top.setBorder(new EmptyBorder(5, 8, 5, 8));
+        top.setOpaque(false);
+        top.setBorder(new EmptyBorder(12, 14, 6, 14));
 
         JLabel lblTitolo = new JLabel(r.getTitolo());
-        lblTitolo.setFont(lblTitolo.getFont().deriveFont(Font.BOLD));
+        lblTitolo.setForeground(TITLE);
+        lblTitolo.setFont(lblTitolo.getFont().deriveFont(Font.BOLD, 15f));
         top.add(lblTitolo);
 
         JLabel lblData = new JLabel(r.getDataTransazione());
-        lblData.setFont(lblData.getFont().deriveFont(Font.ITALIC, 11f));
+        lblData.setForeground(SUBTLE);
+        lblData.setFont(lblData.getFont().deriveFont(Font.ITALIC, 11.5f));
         top.add(lblData);
 
         card.add(top, BorderLayout.NORTH);
@@ -386,12 +500,16 @@ public class VenditoreProfileView extends JPanel {
         // CENTER
         JPanel center = new JPanel();
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
-        center.setBorder(new EmptyBorder(5, 8, 5, 8));
+        center.setBorder(new EmptyBorder(6, 14, 6, 14));
         center.setOpaque(false);
 
         String autore = r.getNomeAutore() + " " + r.getCognomeAutore() + " (" + r.getMatricolaAutore() + ")";
         JLabel lblAutore = new JLabel(autore);
+        lblAutore.setForeground(TITLE);
+        lblAutore.setFont(lblAutore.getFont().deriveFont(Font.PLAIN, 12.5f));
         center.add(lblAutore);
+        
+        center.add(Box.createVerticalStrut(6));
 
         String corpo = r.getCorpo();
         String shortBody = corpo;
@@ -405,12 +523,16 @@ public class VenditoreProfileView extends JPanel {
         txtCorpoShort.setEditable(false);
         txtCorpoShort.setOpaque(false);
         txtCorpoShort.setBorder(null);
+        txtCorpoShort.setForeground(SUBTLE);
+        txtCorpoShort.setFont(txtCorpoShort.getFont().deriveFont(Font.PLAIN, 12.5f));
         center.add(txtCorpoShort);
 
         card.add(center, BorderLayout.CENTER);
 
         // BOTTOM
-        JPanel ratingPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
+        JPanel ratingPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 8));
+        ratingPanel.setOpaque(false);
+        ratingPanel.setBorder(new EmptyBorder(0, 14, 10, 14));
         ratingPanel.add(new JLabel("Valutazione: "));
         int v = Math.max(1, Math.min(5, r.getValutazione()));
         ImageIcon star = getStarIcon();
@@ -426,6 +548,19 @@ public class VenditoreProfileView extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 showRecensioneDialog(r);
+            }
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                card.putClientProperty(FlatClientProperties.STYLE,
+                        "arc: 20; background: #FFFFFF; border: 1,1,1,1,#BFD3EA;");
+                card.repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                card.putClientProperty(FlatClientProperties.STYLE, CARD_STYLE);
+                card.repaint();
             }
         });
 
@@ -452,35 +587,47 @@ public class VenditoreProfileView extends JPanel {
                 Dialog.ModalityType.APPLICATION_MODAL);
 
         JPanel content = new JPanel(new BorderLayout(10, 10));
-        content.setBorder(new EmptyBorder(10, 10, 10, 10));
+        content.setBorder(new EmptyBorder(12, 12, 12, 12));
+        content.setBackground(SURFACE);
         dialog.setContentPane(content);
 
         JLabel lblTitle = new JLabel(r.getTitolo());
+        lblTitle.setForeground(TITLE);
         lblTitle.setFont(lblTitle.getFont().deriveFont(Font.BOLD, 16f));
         content.add(lblTitle, BorderLayout.NORTH);
 
         JPanel center = new JPanel();
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
         center.setBorder(new EmptyBorder(5, 0, 5, 0));
+        center.setOpaque(false);
 
-        center.add(new JLabel("Data transazione: " + r.getDataTransazione()));
-        center.add(new JLabel("Autore: " + r.getNomeAutore() + " " + r.getCognomeAutore()
-                + " (" + r.getMatricolaAutore() + ")"));
+        JLabel l1 = new JLabel("Data transazione: " + r.getDataTransazione());
+        JLabel l2 = new JLabel("Autore: " + r.getNomeAutore() + " " + r.getCognomeAutore()
+                + " (" + r.getMatricolaAutore() + ")");
+        l1.setForeground(TITLE);
+        l2.setForeground(TITLE);
+        center.add(l1);
+        center.add(l2);
         center.add(Box.createVerticalStrut(8));
 
         JTextArea txtFull = new JTextArea(r.getCorpo() != null ? r.getCorpo() : "-");
         txtFull.setLineWrap(true);
         txtFull.setWrapStyleWord(true);
         txtFull.setEditable(false);
+        
         JScrollPane scr = new JScrollPane(txtFull);
-        scr.setPreferredSize(new Dimension(400, 200));
+        scr.setPreferredSize(new Dimension(420, 220));
         scr.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scr.setBorder(BorderFactory.createEmptyBorder());
         center.add(scr);
 
         content.add(center, BorderLayout.CENTER);
 
         JPanel south = new JPanel(new BorderLayout());
+        south.setOpaque(false);
+        
         JPanel starsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0));
+        starsPanel.setOpaque(false);
         starsPanel.add(new JLabel("Valutazione: "));
         int v = Math.max(1, Math.min(5, r.getValutazione()));
         ImageIcon star = getStarIcon();
@@ -490,8 +637,19 @@ public class VenditoreProfileView extends JPanel {
         south.add(starsPanel, BorderLayout.WEST);
 
         JButton btnClose = new JButton("Chiudi");
+        btnClose.putClientProperty(FlatClientProperties.STYLE,
+                "arc: 12; " +
+                        "background: #1B415D; foreground: #FFFFFF; " +
+                        "hoverBackground: #2A5E86; pressedBackground: #163245;");
+        btnClose.setFocusable(false);
+        btnClose.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnClose.setBorderPainted(false);
+        btnClose.setContentAreaFilled(true);
+
         btnClose.addActionListener(e -> dialog.dispose());
+
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnPanel.setOpaque(false);
         btnPanel.add(btnClose);
         south.add(btnPanel, BorderLayout.EAST);
 
