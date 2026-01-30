@@ -263,7 +263,7 @@ public class AnnunciListView extends JPanel {
             });
 
             JButton btnOfferta = new JButton("Fai offerta");
-            styleSecondaryButton(btnOfferta);
+            stylePrimaryButton(btnOfferta);
             btnOfferta.addActionListener(e -> {
                 if (annuncioOffertaListener != null) {
                     annuncioOffertaListener.onOffertaAction(annuncio, OffertaAction.FAI_OFFERTA);
