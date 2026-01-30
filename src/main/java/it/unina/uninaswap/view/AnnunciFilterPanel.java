@@ -7,7 +7,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -24,8 +23,10 @@ import it.unina.uninaswap.util.UITheme;
 
 public class AnnunciFilterPanel extends JPanel {
 
-    private JTextField txtSearchFilter;
-    private JComboBox<String> cmbCategoria;
+    private JTextField boundSearchField;
+    private JComboBox<String> boundCategoriaCombo;
+
+
     private JRadioButton rbTipoTutti;
     private JRadioButton rbVendita;
     private JRadioButton rbScambio;
@@ -50,52 +51,6 @@ public class AnnunciFilterPanel extends JPanel {
         c.weightx = 1.0;
 
         int row = 0;
-
-        // Ricerca
-        JLabel lblCerca = createSectionLabel("Cerca");
-        c.gridx = 0;
-        c.gridy = row++;
-        add(lblCerca, c);
-
-        txtSearchFilter = new JTextField();
-        txtSearchFilter.setPreferredSize(new Dimension(0, 32));
-        c.gridx = 0;
-        c.gridy = row++;
-        add(txtSearchFilter, c);
-
-        // Separatore leggero
-        c.gridx = 0;
-        c.gridy = row++;
-        c.insets = new Insets(12, 0, 12, 0);
-        add(createLightSeparator(), c);
-        c.insets = new Insets(8, 12, 8, 12);
-
-        // Categoria
-        JLabel lblCategoria = createSectionLabel("Categoria");
-        c.gridx = 0;
-        c.gridy = row++;
-        add(lblCategoria, c);
-
-        cmbCategoria = new JComboBox<>();
-        cmbCategoria.addItem("Tutte");
-        cmbCategoria.addItem("Strumenti_musicali");
-        cmbCategoria.addItem("Libri");
-        cmbCategoria.addItem("Informatica");
-        cmbCategoria.addItem("Abbigliamento");
-        cmbCategoria.addItem("Arredo");
-        cmbCategoria.addItem("Altro");
-        cmbCategoria.setPreferredSize(new Dimension(0, 32));
-
-        c.gridx = 0;
-        c.gridy = row++;
-        add(cmbCategoria, c);
-
-        // Separatore
-        c.gridx = 0;
-        c.gridy = row++;
-        c.insets = new Insets(12, 0, 12, 0);
-        add(createLightSeparator(), c);
-        c.insets = new Insets(8, 12, 8, 12);
 
         // Tipologia
         JLabel lblTipologia = createSectionLabel("Tipologia");
@@ -132,7 +87,6 @@ public class AnnunciFilterPanel extends JPanel {
         c.gridy = row++;
         add(tipoPanel, c);
 
-        // Separatore
         c.gridx = 0;
         c.gridy = row++;
         c.insets = new Insets(12, 0, 12, 0);
@@ -163,7 +117,6 @@ public class AnnunciFilterPanel extends JPanel {
         c.gridy = row++;
         add(txtPrezzoMax, c);
 
-        // Separatore
         c.gridx = 0;
         c.gridy = row++;
         c.insets = new Insets(12, 0, 12, 0);
@@ -191,20 +144,24 @@ public class AnnunciFilterPanel extends JPanel {
         c.gridy = row++;
         add(consegnaPanel, c);
 
-        // Separatore
         c.gridx = 0;
         c.gridy = row++;
         c.insets = new Insets(12, 0, 12, 0);
         add(createLightSeparator(), c);
         c.insets = new Insets(8, 12, 8, 12);
 
-        // Bottone Cerca - styled as primary
+
         btnCerca = new JButton("Cerca");
         btnCerca.putClientProperty("JButton.buttonType", "default");
         btnCerca.setPreferredSize(new Dimension(0, 36));
         c.gridx = 0;
         c.gridy = row++;
         add(btnCerca, c);
+    }
+
+    public void bindTopSearchControls(JTextField searchField, JComboBox<String> categoriaCombo) {
+        this.boundSearchField = searchField;
+        this.boundCategoriaCombo = categoriaCombo;
     }
 
     private JLabel createSectionLabel(String text) {
@@ -220,16 +177,19 @@ public class AnnunciFilterPanel extends JPanel {
         return sep;
     }
 
-    // Getter per il controller
+
     public String getSearchText() {
-        return txtSearchFilter.getText().trim();
+        if (boundSearchField == null) return "";
+        return boundSearchField.getText().trim();
     }
 
     public String getSelectedCategoria() {
-        String value = (String) cmbCategoria.getSelectedItem();
-        if ("Tutte".equals(value)) {
-            return null;
-        }
+        if (boundCategoriaCombo == null) return null;
+
+        String value = (String) boundCategoriaCombo.getSelectedItem();
+        if (value == null) return null;
+
+        if ("Tutte".equals(value)) return null;
         return value;
     }
 

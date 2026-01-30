@@ -8,7 +8,7 @@ public class DBConnection {
 	
 	private static final String URL = "jdbc:postgresql://localhost:5432/UninaSwap";
 	private static final String USER = "postgres";
-	private static final String PASSWORD = "2265";
+	private static final String PASSWORD = "59556";
 	
 	public static Connection getConnection() throws SQLException {
 		return DriverManager.getConnection(URL, USER, PASSWORD);
