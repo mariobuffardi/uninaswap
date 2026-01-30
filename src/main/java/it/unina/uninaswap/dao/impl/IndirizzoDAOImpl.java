@@ -44,4 +44,35 @@ public class IndirizzoDAOImpl implements IndirizzoDAO {
         }
         return list;
     }
+    
+    
+    
+    @Override
+    public void insert(Indirizzo i) throws Exception {
+        try (Connection conn = DBConnection.getConnection()) {
+            insert(i, conn);
+        }
+    }
+
+    @Override
+    public void insert(Indirizzo i, Connection conn) throws Exception {
+        String sql = """
+            INSERT INTO indirizzo (via, citta, cap, civico, stato, matricola_studente)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """;
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, i.getVia());
+            ps.setString(2, i.getCitta());
+            ps.setInt(3, i.getCap());
+            ps.setInt(4, i.getCivico());
+            ps.setString(5, i.getStato());
+            ps.setString(6, i.getMatricolaStudente());
+
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows == 0) {
+                throw new Exception("Creazione indirizzo fallita, nessuna riga modificata.");
+            }
+        }
+    }
+    
 }
