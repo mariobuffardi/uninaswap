@@ -14,7 +14,9 @@ public interface StudenteDAO {
     
     boolean existsByEmail(String email) throws Exception;
     
-    String insertAndReturnMatricola(Studente s) throws Exception;
+    boolean existsByMatricola(String matricola) throws Exception;
     
-    String insertAndReturnMatricola(Studente s, Connection conn) throws Exception;
+    void insert(Studente s) throws Exception;
+    
+    void insert(Studente s, Connection conn) throws Exception;
 }

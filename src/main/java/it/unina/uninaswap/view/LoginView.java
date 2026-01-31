@@ -47,6 +47,7 @@ public class LoginView extends JFrame {
     private JButton btnLogin;
     private JButton btnGoRegisterLink;
 
+    private JTextField regMatricola;
     private JTextField regEmail;
     private JTextField regNome;
     private JTextField regCognome;
@@ -78,12 +79,13 @@ public class LoginView extends JFrame {
         super("UniNaSwap - Login / Registrazione");
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(980, 560));
+        setMinimumSize(new Dimension(1000, 600));
         setLocationRelativeTo(null);
 
         buildUI();
 
         setVisible(true);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         refreshImages();
     }
 
@@ -92,7 +94,6 @@ public class LoginView extends JFrame {
         root.setBackground(WHITE);
         setContentPane(root);
 
-        // ===== TOP BAR =====
         JPanel top = new JPanel(new BorderLayout());
         top.setBackground(PRIMARY);
         top.setBorder(new EmptyBorder(10, 16, 10, 16));
@@ -104,15 +105,13 @@ public class LoginView extends JFrame {
 
         root.add(top, BorderLayout.NORTH);
 
-        // ===== CENTER (LEFT + RIGHT) =====
         JPanel center = new JPanel(new BorderLayout());
         center.setBackground(WHITE);
         root.add(center, BorderLayout.CENTER);
 
-        // LEFT = cards
         JPanel left = new JPanel(new BorderLayout());
         left.setBackground(DARK);
-        left.setPreferredSize(new Dimension(460, 10));
+        left.setPreferredSize(new Dimension(600, 10));
 
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
@@ -124,7 +123,6 @@ public class LoginView extends JFrame {
         left.add(cardPanel, BorderLayout.CENTER);
         center.add(left, BorderLayout.WEST);
 
-        // RIGHT = hero
         JPanel right = new JPanel(new BorderLayout());
         right.setBackground(WHITE);
         right.setBorder(new EmptyBorder(14, 14, 14, 14));
@@ -152,7 +150,7 @@ public class LoginView extends JFrame {
         });
     }
 
-    // Card login
+
     private JPanel buildLoginCard() {
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(DARK);
@@ -200,7 +198,6 @@ public class LoginView extends JFrame {
 
         card.add(form, BorderLayout.CENTER);
 
-        
         JPanel bottom = new JPanel();
         bottom.setOpaque(false);
         bottom.setLayout(new BoxLayout(bottom, BoxLayout.Y_AXIS));
@@ -223,7 +220,7 @@ public class LoginView extends JFrame {
         return card;
     }
 
-    // card registraznoie
+
     private JPanel buildRegisterCard() {
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(DARK);
@@ -246,6 +243,9 @@ public class LoginView extends JFrame {
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
         form.add(title);
         form.add(Box.createVerticalStrut(14));
+
+        form.add(label("Matricola"));
+        regMatricola = field("9 cifre, es. 000000001"); form.add(regMatricola); form.add(Box.createVerticalStrut(10));
 
         form.add(label("Email"));
         regEmail = field("email@unina.it"); form.add(regEmail); form.add(Box.createVerticalStrut(10));
@@ -350,7 +350,7 @@ public class LoginView extends JFrame {
         JOptionPane.showMessageDialog(this, message, "Successo", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // getters registrazione
+    public String getRegMatricola() { return regMatricola.getText().trim(); }
     public String getRegEmail() { return regEmail.getText().trim(); }
     public String getRegNome() { return regNome.getText().trim(); }
     public String getRegCognome() { return regCognome.getText().trim(); }
@@ -443,27 +443,28 @@ public class LoginView extends JFrame {
     }
 
     public void clearRegisterFields() {
-    regEmail.setText("");
-    regNome.setText("");
-    regCognome.setText("");
-    regPassword.setText("");
+        regMatricola.setText("");
+        regEmail.setText("");
+        regNome.setText("");
+        regCognome.setText("");
+        regPassword.setText("");
 
-    regSesso.setSelectedIndex(0);
+        regSesso.setSelectedIndex(0);
 
-    regPrefSpedizione.setSelected(false);
-    regPrefIncontro.setSelected(false);
+        regPrefSpedizione.setSelected(false);
+        regPrefIncontro.setSelected(false);
 
-    regVia.setText("");
-    regCivico.setText("");
-    regCap.setText("");
-    regCitta.setText("");
-    regStato.setText("");
+        regVia.setText("");
+        regCivico.setText("");
+        regCap.setText("");
+        regCitta.setText("");
+        regStato.setText("");
 
-    SwingUtilities.invokeLater(() -> {
-        if (registerScrollPane != null) {
-            registerScrollPane.getVerticalScrollBar().setValue(0);
-        }
-    });
-}
+        SwingUtilities.invokeLater(() -> {
+            if (registerScrollPane != null) {
+                registerScrollPane.getVerticalScrollBar().setValue(0);
+            }
+        });
+    }
 
 }

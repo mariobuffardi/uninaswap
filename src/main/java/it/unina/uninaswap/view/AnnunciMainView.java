@@ -65,7 +65,7 @@ public class AnnunciMainView extends JFrame {
 
     public AnnunciMainView(Studente studenteLoggato) {
         setTitle("UniNaSwap");
-        setSize(1000, 750);
+        setMinimumSize(new Dimension(1000, 750));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -180,6 +180,8 @@ public class AnnunciMainView extends JFrame {
         });
 
         SwingUtilities.invokeLater(this::resizeSidePanels);
+        
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
     private void buildSearchBar() {

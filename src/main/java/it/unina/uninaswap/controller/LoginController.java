@@ -67,14 +67,20 @@ public class LoginController {
         if (!validateRegistrationInput()) return;
 
         String email = view.getRegEmail();
+        String matricola = view.getRegMatricola();
 
         try {
+            if (studenteDAO.existsByMatricola(matricola)) {
+                view.showError("Matricola già registrata.");
+                return;
+            }
             if (studenteDAO.existsByEmail(email)) {
                 view.showError("L'email '" + email + "' è già in uso.");
                 return;
             }
 
             Studente s = new Studente();
+            s.setMatricola(matricola);
             s.setNome(view.getRegNome());
             s.setCognome(view.getRegCognome());
             s.setEmail(email);
@@ -90,20 +96,21 @@ public class LoginController {
             i.setCivico(Integer.parseInt(view.getRegCivico()));
             i.setCap(Integer.parseInt(view.getRegCap()));
 
-            String matricola;
-
+            i.setMatricolaStudente(matricola);
+            
+            
             try (Connection conn = DBConnection.getConnection()) {
                 conn.setAutoCommit(false);
                 
-                matricola = studenteDAO.insertAndReturnMatricola(s, conn);
-
+                studenteDAO.insert(s, conn);
+                
                 i.setMatricolaStudente(matricola);
                 indirizzoDAO.insert(i, conn);
 
                 conn.commit();
             }
 
-            view.showSuccess("Registrazione completata!\nLa tua matricola è: " + matricola);
+            view.showSuccess("Registrazione completata con matricola: " + matricola);
             view.clearRegisterFields();
             view.switchToLoginCardPrefillEmail(email);
 
@@ -114,12 +121,19 @@ public class LoginController {
     }
 
     private boolean validateRegistrationInput() {
-        if (view.getRegNome().isEmpty() || view.getRegCognome().isEmpty() || view.getRegEmail().isEmpty() ||
-                view.getRegPassword().isEmpty() || view.getRegVia().isEmpty() || view.getRegCivico().isEmpty() ||
+        if (view.getRegMatricola().isEmpty() || view.getRegNome().isEmpty() || view.getRegCognome().isEmpty() || view.getRegEmail().isEmpty() ||
+        		view.getRegPassword().isEmpty() || view.getRegVia().isEmpty() || view.getRegCivico().isEmpty() ||
                 view.getRegCap().isEmpty() || view.getRegCitta().isEmpty() || view.getRegStato().isEmpty()) {
             view.showError("Tutti i campi sono obbligatori.");
             return false;
         }
+        
+        String matricola = view.getRegMatricola();
+        if (!matricola.matches("^\\d{9}$")) {
+            view.showError("La matricola deve essere composta da esattamente 9 cifre.");
+            return false;
+        }
+
 
         String email = view.getRegEmail();
         if (!email.contains("@") || !email.contains(".")) {
