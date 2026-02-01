@@ -2,9 +2,13 @@ package it.unina.uninaswap.view;
 
 import it.unina.uninaswap.model.entity.Studente;
 import it.unina.uninaswap.model.enums.SessoStudente;
+import it.unina.uninaswap.util.UITheme;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import com.formdev.flatlaf.FlatClientProperties;
+
 import java.awt.*;
 
 
@@ -19,7 +23,7 @@ public class StudenteSettingsDialog extends JDialog {
     private JCheckBox chkSpedizione;
     private JCheckBox chkInUni;
 
-    // ===== Indirizzo =====
+    // Indirizzo
     private JTextField txtVia;
     private JTextField txtCivico;
     private JTextField txtCap;
@@ -36,13 +40,11 @@ public class StudenteSettingsDialog extends JDialog {
     private Studente editedStudente;
 
 
-     // Costruttore base (retrocompatibile): nessun indirizzo precompilato.
     public StudenteSettingsDialog(JFrame parent, Studente originale) {
         this(parent, originale, null, null, null, null, null);
     }
 
 
-     // Costruttore con indirizzo precompilato (se lo studente ha già un indirizzo salvato).
     public StudenteSettingsDialog(JFrame parent,
                                   Studente originale,
                                   String via,
@@ -61,42 +63,36 @@ public class StudenteSettingsDialog extends JDialog {
         this.origStato = stato;
 
         JPanel content = new JPanel();
-        content.setBorder(new EmptyBorder(10, 10, 10, 10));
+        content.setBorder(new EmptyBorder(14, 14, 14, 14));
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBackground(UITheme.BACKGROUND_LIGHT);
         setContentPane(content);
 
-        // MATRICOLA (read-only)
         txtMatricola = new JTextField();
         txtMatricola.setEditable(false);
         content.add(labeledRow("Matricola:", txtMatricola));
         content.add(Box.createVerticalStrut(8));
 
-        // NOME
         txtNome = new JTextField();
         content.add(labeledRow("Nome:", txtNome));
         content.add(Box.createVerticalStrut(8));
 
-        // COGNOME
         txtCognome = new JTextField();
         content.add(labeledRow("Cognome:", txtCognome));
         content.add(Box.createVerticalStrut(8));
 
-        // EMAIL
         txtEmail = new JTextField();
         content.add(labeledRow("Email:", txtEmail));
         content.add(Box.createVerticalStrut(8));
 
-        // PASSWORD
         txtPassword = new JPasswordField();
         content.add(labeledRow("Password:", txtPassword));
         content.add(Box.createVerticalStrut(8));
 
-        // SESSO
         cmbSesso = new JComboBox<>(SessoStudente.values());
         content.add(labeledRow("Sesso:", cmbSesso));
         content.add(Box.createVerticalStrut(8));
 
-        // PREFERENZE CONSEGNA
         JPanel prefPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         prefPanel.setBorder(BorderFactory.createTitledBorder("Preferenze consegna"));
         chkSpedizione = new JCheckBox("Spedizione");
@@ -106,7 +102,6 @@ public class StudenteSettingsDialog extends JDialog {
         content.add(prefPanel);
         content.add(Box.createVerticalStrut(10));
 
-        // INDIRIZZO 
         JPanel indPanel = new JPanel();
         indPanel.setLayout(new BoxLayout(indPanel, BoxLayout.Y_AXIS));
         indPanel.setBorder(BorderFactory.createTitledBorder("Indirizzo (per spedizione)"));
@@ -130,10 +125,21 @@ public class StudenteSettingsDialog extends JDialog {
         content.add(indPanel);
         content.add(Box.createVerticalStrut(10));
 
-        // BOTTONI
+
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttons.setBackground(UITheme.BACKGROUND_LIGHT);
         JButton btnAnnulla = new JButton("Annulla");
         JButton btnSalva = new JButton("Salva");
+        btnSalva.setFocusable(false);
+        btnSalva.putClientProperty(FlatClientProperties.STYLE,
+            "arc: 12; background: #1B415D; foreground: #FFFFFF; hoverBackground: #2A5E86; pressedBackground: #163245;");
+        btnAnnulla.putClientProperty(FlatClientProperties.STYLE,
+            "arc: 12; background: #D93C25; foreground: #FFFFFF; hoverBackground: #B93522; pressedBackground: #8F2A1B;");
+        btnAnnulla.setFocusable(false);
+        btnAnnulla.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        btnAnnulla.setBorderPainted(false);
+        btnAnnulla.setContentAreaFilled(true);
+        btnAnnulla.setOpaque(false);
         buttons.add(btnAnnulla);
         buttons.add(btnSalva);
         content.add(buttons);
@@ -166,9 +172,27 @@ public class StudenteSettingsDialog extends JDialog {
     }
 
     private JPanel labeledRow(String label, JComponent comp) {
-        JPanel p = new JPanel(new BorderLayout(5, 5));
-        p.add(new JLabel(label), BorderLayout.WEST);
-        p.add(comp, BorderLayout.CENTER);
+        JPanel p = new JPanel(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(0, 0, 0, 0);
+        gbc.gridy = 0;
+
+        JLabel lbl = new JLabel(label);
+        lbl.setPreferredSize(new Dimension(100, lbl.getPreferredSize().height));
+
+        gbc.gridx = 0;
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.WEST;
+        p.add(lbl, gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.CENTER;
+        p.add(comp, gbc);
+
         return p;
     }
 
@@ -270,7 +294,7 @@ public class StudenteSettingsDialog extends JDialog {
         return editedStudente;
     }
 
-    // Getter Indirizzo compilato
+
     public boolean hasIndirizzoCompilato() {
         String via = txtVia.getText().trim();
         String civicoStr = txtCivico.getText().trim();

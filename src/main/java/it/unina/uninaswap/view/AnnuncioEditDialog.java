@@ -59,17 +59,15 @@ public class AnnuncioEditDialog extends JDialog {
     private JCheckBox chkSpedizione;
     private JCheckBox chkInUni;
 
-    // Foto (thumbnail visuali)
     private JPanel thumbnailContainer;
     private final List<FotoWrapper> fotoWrappers = new ArrayList<>();
 
     private boolean confirmed = false;
 
-    // Wrapper interno per gestire foto in edit
     private static class FotoWrapper {
-        Integer fotoId; // null se nuova foto non ancora salvata
-        String filename; // SOLO nome file 
-        File sourceFile; // solo per nuove foto
+        Integer fotoId;
+        String filename;
+        File sourceFile;
         boolean isPrincipale;
         boolean isDeleted;
 
@@ -99,14 +97,12 @@ public class AnnuncioEditDialog extends JDialog {
         this.original = annuncio;
         this.edited = cloneAnnuncio(annuncio);
 
-        // Carica foto esistenti
         if (fotoList != null) {
             for (Foto f : fotoList) {
                 String filenameOnly = onlyFilename(f.getPath());
                 fotoWrappers.add(new FotoWrapper(f.getId(), filenameOnly, f.isPrincipale()));
             }
         }
-        // se ci sono foto ma nessuna principale, la prima diventa principale
         ensureSinglePrincipalOnWrappers();
 
         initUI();
@@ -150,11 +146,9 @@ public class AnnuncioEditDialog extends JDialog {
         formScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         content.add(formScroll, BorderLayout.CENTER);
 
-        // Titolo
         txtTitolo = new JTextField(edited.getTitolo() != null ? edited.getTitolo() : "", 30);
         form.add(labeled("Titolo *", txtTitolo));
 
-        // Descrizione
         txtDescrizione = new JTextArea(
                 edited.getDescrizione() != null ? edited.getDescrizione() : "",
                 3, 30);
@@ -162,12 +156,10 @@ public class AnnuncioEditDialog extends JDialog {
         txtDescrizione.setWrapStyleWord(true);
         form.add(labeled("Descrizione", new JScrollPane(txtDescrizione)));
 
-        // Tipologia
         cmbTipologia = new JComboBox<>(new String[] { "Vendita", "Scambio", "Regalo" });
         cmbTipologia.setSelectedItem(edited.getTipologia());
         form.add(labeled("Tipologia *", cmbTipologia));
 
-        // Categoria
         cmbCategoria = new JComboBox<>(new String[] {
                 "Strumenti_musicali", "Libri", "Informatica",
                 "Abbigliamento", "Arredo", "Altro"
@@ -175,20 +167,17 @@ public class AnnuncioEditDialog extends JDialog {
         cmbCategoria.setSelectedItem(edited.getCategoria());
         form.add(labeled("Categoria *", cmbCategoria));
 
-        // Oggetto richiesto
         txtOggettoRichiesto = new JTextField(
                 edited.getOggettoRichiesto() != null ? edited.getOggettoRichiesto() : "",
                 30);
         form.add(labeled("Oggetto richiesto (solo Scambio)", txtOggettoRichiesto));
 
-        // Prezzo
         txtPrezzo = new JTextField();
         if (edited.getPrezzo() != null) {
             txtPrezzo.setText(edited.getPrezzo().toPlainString());
         }
         form.add(labeled("Prezzo (solo Vendita)", txtPrezzo));
 
-        // Opzioni consegna
         JPanel consegnaPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         chkSpedizione = new JCheckBox("Spedizione", edited.isOffreSpedizione());
         chkInUni = new JCheckBox("Incontro in Uni", edited.isOffreIncontroInUni());
@@ -196,7 +185,6 @@ public class AnnuncioEditDialog extends JDialog {
         consegnaPanel.add(chkInUni);
         form.add(labeled("Consegna *", consegnaPanel));
 
-        // FOTO (thumbnail visuali)
         JPanel fotoPanel = new JPanel(new BorderLayout(5, 5));
         fotoPanel.setBorder(
                 BorderFactory.createTitledBorder("Foto annuncio (clic sulla foto per impostare la principale)"));
@@ -221,7 +209,6 @@ public class AnnuncioEditDialog extends JDialog {
         form.add(Box.createVerticalStrut(10));
         form.add(fotoPanel);
 
-        // Pulsanti OK / Annulla
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton btnAnnulla = new JButton("Annulla");
         JButton btnSalva = new JButton("Salva modifiche");
@@ -230,17 +217,14 @@ public class AnnuncioEditDialog extends JDialog {
         buttons.add(btnSalva);
         content.add(buttons, BorderLayout.SOUTH);
 
-        // Listener combobox tipologia -> abilita/disabilita campi
         cmbTipologia.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED)
                 updateFieldsByTipologia();
         });
         updateFieldsByTipologia();
 
-        // Listener foto
         btnAddFoto.addActionListener(e -> onAddFoto());
 
-        // Listener bottoni
         btnAnnulla.addActionListener(e -> {
             confirmed = false;
             dispose();
@@ -260,7 +244,6 @@ public class AnnuncioEditDialog extends JDialog {
     }
 
 
-    // Tipologia -> abilita/disabilita campi
     private void updateFieldsByTipologia() {
         String tipo = (String) cmbTipologia.getSelectedItem();
 
@@ -286,7 +269,6 @@ public class AnnuncioEditDialog extends JDialog {
     }
 
 
-    // FOTO: gestione UI
     private void refreshThumbnailPanel() {
         thumbnailContainer.removeAll();
 
@@ -320,7 +302,6 @@ public class AnnuncioEditDialog extends JDialog {
             card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
         }
 
-        // X remove
         JButton btnRemove = new JButton("×");
         btnRemove.setFont(new Font("Arial", Font.BOLD, 16));
         btnRemove.setPreferredSize(new Dimension(26, 26));
@@ -336,7 +317,6 @@ public class AnnuncioEditDialog extends JDialog {
         top.add(btnRemove);
         card.add(top, BorderLayout.NORTH);
 
-        // Image center (clickable)
         JLabel lblImage = new JLabel();
         lblImage.setHorizontalAlignment(SwingConstants.CENTER);
         lblImage.setVerticalAlignment(SwingConstants.CENTER);
@@ -346,7 +326,6 @@ public class AnnuncioEditDialog extends JDialog {
         if (fw.isNew()) {
             thumb = ImageUtil.loadImageThumbnail(fw.sourceFile, 130, 115);
         } else {
-            // fw.filename è solo nome file -> DB path = images/annunci/<file>
             thumb = ImageUtil.annuncioImageFromDbPath("images/annunci/" + fw.filename);
             thumb = ImageUtil.scaled(thumb, 130, 115);
         }
@@ -397,7 +376,6 @@ public class AnnuncioEditDialog extends JDialog {
         removed.isDeleted = true;
         removed.isPrincipale = false;
 
-        // Se restano foto visibili, garantisci una principale
         ensureSinglePrincipalOnWrappers();
         refreshThumbnailPanel();
     }
@@ -443,12 +421,10 @@ public class AnnuncioEditDialog extends JDialog {
         if (visible.isEmpty())
             return;
 
-        // se nessuna principale -> prima principale
         if (visible.stream().noneMatch(w -> w.isPrincipale)) {
             visible.get(0).isPrincipale = true;
         }
 
-        // se più di una -> tieni la prima e spegni le altre
         boolean found = false;
         for (FotoWrapper w : visible) {
             if (!w.isPrincipale)
@@ -461,7 +437,6 @@ public class AnnuncioEditDialog extends JDialog {
     }
 
 
-    // Salvataggio
     private void onSave() {
         try {
             String titolo = txtTitolo.getText().trim();
@@ -479,7 +454,6 @@ public class AnnuncioEditDialog extends JDialog {
             edited.setTipologia(tipologia);
             edited.setCategoria(categoria);
 
-            // Oggetto richiest
             if ("Scambio".equals(tipologia)) {
                 String objReq = txtOggettoRichiesto.getText().trim();
                 if (objReq.isEmpty()) {
@@ -494,7 +468,6 @@ public class AnnuncioEditDialog extends JDialog {
                 edited.setOggettoRichiesto(null);
             }
 
-            // Prezzo
             String prezzoText = txtPrezzo.getText().trim();
             if ("Vendita".equals(tipologia)) {
                 if (prezzoText.isEmpty()) {
@@ -518,7 +491,6 @@ public class AnnuncioEditDialog extends JDialog {
                 edited.setPrezzo(null);
             }
 
-            // Consegna
             edited.setOffreSpedizione(chkSpedizione.isSelected());
             edited.setOffreIncontroInUni(chkInUni.isSelected());
 
@@ -530,10 +502,8 @@ public class AnnuncioEditDialog extends JDialog {
                 return;
             }
 
-            // Foto: garantisci principale unica (se ci sono foto)
             ensureSinglePrincipalOnWrappers();
 
-            // Copia nuove foto nella directory resources (+ target/classes best effort)
             for (FotoWrapper fw : fotoWrappers) {
                 if (fw.isNew() && !fw.isDeleted) {
                     try {
@@ -569,11 +539,7 @@ public class AnnuncioEditDialog extends JDialog {
         return confirmed ? edited : null;
     }
 
-    /**
-     * IMPORTANTISSIMO:
-     * - path DB = "images/annunci/<filename>"
-     * - principale PRIMA in lista (per evitare errore col trigger)
-     */
+
     public List<Foto> getEditedFotoList() {
         if (!confirmed)
             return new ArrayList<>();
@@ -595,7 +561,6 @@ public class AnnuncioEditDialog extends JDialog {
             result.add(f);
         }
 
-        // Safety: una sola principale
         if (!result.isEmpty() && result.stream().noneMatch(Foto::isPrincipale)) {
             result.get(0).setPrincipale(true);
         }
@@ -609,7 +574,6 @@ public class AnnuncioEditDialog extends JDialog {
                 f.setPrincipale(false);
         }
 
-        // ORDINAMENTO: principale prima (evita violazione col trigger)
         result.sort(Comparator.comparing(Foto::isPrincipale).reversed());
         return result;
     }

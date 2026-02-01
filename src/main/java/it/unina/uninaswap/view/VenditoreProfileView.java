@@ -105,7 +105,6 @@ public class VenditoreProfileView extends JPanel {
         top.setBorder(new EmptyBorder(10, 12, 10, 12));
 
         btnBack = new JButton("← Indietro");
-        // Stile semplice per il back button
         btnBack.setFont(btnBack.getFont().deriveFont(Font.BOLD, 14f));
         btnBack.setForeground(TITLE);
         btnBack.setBorderPainted(false);
@@ -125,7 +124,6 @@ public class VenditoreProfileView extends JPanel {
         top.add(spacer, BorderLayout.EAST);
         add(top, BorderLayout.NORTH);
 
-        // CONTENUTO SCROLLABILE 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(new EmptyBorder(10, 20, 20, 20));
@@ -139,13 +137,11 @@ public class VenditoreProfileView extends JPanel {
         scrollPane.setBackground(SURFACE);
         add(scrollPane, BorderLayout.CENTER);
 
-        // FOTO
         lblFotoProfilo = new JLabel();
         lblFotoProfilo.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(lblFotoProfilo);
         mainPanel.add(Box.createVerticalStrut(14));
 
-        // titolo info
         JLabel lblTitoloInfo = new JLabel("Informazioni venditore");
         lblTitoloInfo.setForeground(TITLE);
         lblTitoloInfo.setFont(lblTitoloInfo.getFont().deriveFont(Font.BOLD, 18f));
@@ -153,7 +149,6 @@ public class VenditoreProfileView extends JPanel {
         mainPanel.add(lblTitoloInfo);
         mainPanel.add(Box.createVerticalStrut(10));
 
-        // info panel
         JPanel infoCard = new JPanel(new BorderLayout());
         infoCard.setOpaque(true);
         infoCard.setBackground(Color.WHITE);
@@ -195,7 +190,6 @@ public class VenditoreProfileView extends JPanel {
         annunciPreviewPanel.setOpaque(false);
         annunciPreviewPanel.setBorder(new EmptyBorder(6, 6, 6, 6));
 
-        // Scroll orizzontale
         JScrollPane annScroll = new JScrollPane(annunciPreviewPanel);
         annScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         annScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -216,7 +210,6 @@ public class VenditoreProfileView extends JPanel {
         recensioniPreviewPanel.setOpaque(false);
         recensioniPreviewPanel.setBorder(new EmptyBorder(6, 6, 6, 6));
 
-        // Scroll orizzontale recensioni
         JScrollPane recScroll = new JScrollPane(recensioniPreviewPanel);
         recScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         recScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -229,7 +222,6 @@ public class VenditoreProfileView extends JPanel {
         recensioniSection.add(recScroll, BorderLayout.CENTER);
         mainPanel.add(recensioniSection);
 
-        // stato iniziale
         setVenditore(null);
         setAnnunciVenditore(null);
         setRecensioniVenditore(null);
@@ -257,7 +249,6 @@ public class VenditoreProfileView extends JPanel {
     }
 
 
-    // API controller 
     public void setVenditore(Studente venditore) {
         this.currentVenditore = venditore;
 
@@ -480,7 +471,6 @@ public class VenditoreProfileView extends JPanel {
         card.setMinimumSize(fixed);
         card.setMaximumSize(fixed);
 
-        // TOP
         JPanel top = new JPanel();
         top.setOpaque(false);
         top.setBorder(new EmptyBorder(12, 14, 6, 14));
@@ -497,7 +487,6 @@ public class VenditoreProfileView extends JPanel {
 
         card.add(top, BorderLayout.NORTH);
 
-        // CENTER
         JPanel center = new JPanel();
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
         center.setBorder(new EmptyBorder(6, 14, 6, 14));
@@ -529,7 +518,6 @@ public class VenditoreProfileView extends JPanel {
 
         card.add(center, BorderLayout.CENTER);
 
-        // BOTTOM
         JPanel ratingPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 8));
         ratingPanel.setOpaque(false);
         ratingPanel.setBorder(new EmptyBorder(0, 14, 10, 14));

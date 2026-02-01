@@ -1,14 +1,37 @@
 package it.unina.uninaswap.view;
 
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.time.LocalDate;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+
 import it.unina.uninaswap.model.entity.Annuncio;
 import it.unina.uninaswap.model.entity.Indirizzo;
 import it.unina.uninaswap.model.entity.Studente;
+import it.unina.uninaswap.util.UITheme;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
-import java.time.LocalDate;
-import java.util.List;
 
 public class AccettaOffertaDialog extends JDialog {
 
@@ -58,12 +81,13 @@ public class AccettaOffertaDialog extends JDialog {
 
         super(parent, "Accetta offerta - modalità consegna", true);
 
-        setSize(520, 380);
+        setSize(520, 400);
         setLocationRelativeTo(parent);
 
         JPanel content = new JPanel();
-        content.setBorder(new EmptyBorder(10,10,10,10));
+        content.setBorder(new EmptyBorder(14,14,14,14));
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBackground(it.unina.uninaswap.util.UITheme.BACKGROUND_LIGHT);
         setContentPane(content);
 
         // Header
@@ -73,6 +97,8 @@ public class AccettaOffertaDialog extends JDialog {
                 " (" + acquirente.getMatricola() + ")</html>"
         );
         lblTitolo.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblTitolo.setFont(new Font("SansSerif", Font.BOLD, 16));
+        lblTitolo.setForeground(it.unina.uninaswap.util.UITheme.PRIMARY_DARK);
         content.add(lblTitolo);
         content.add(Box.createVerticalStrut(10));
 
@@ -83,9 +109,10 @@ public class AccettaOffertaDialog extends JDialog {
             if (!pref.isEmpty()) pref += "- ";
             pref += "Incontro in Uni";
         }
-        JLabel lblPref = new JLabel("Preferenze acquirente: " +
-                (pref.isBlank() ? "-" : pref));
+        JLabel lblPref = new JLabel("Preferenze acquirente: " + (pref.isBlank() ? "-" : pref));
         lblPref.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblPref.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        lblPref.setForeground(it.unina.uninaswap.util.UITheme.TEXT_SECONDARY);
         content.add(lblPref);
         content.add(Box.createVerticalStrut(10));
 
@@ -124,8 +151,8 @@ public class AccettaOffertaDialog extends JDialog {
 
         // Pannello SPEDIZIONE
         JPanel panelSpedizione = new JPanel(new BorderLayout(5,5));
-        panelSpedizione.setBorder(BorderFactory.createTitledBorder("Spedizione"));
-
+        panelSpedizione.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(UITheme.BORDER_LIGHT), "Spedizione"));
+        panelSpedizione.setBackground(UITheme.WHITE);
         cmbIndirizzi = new JComboBox<>();
         if (indirizziAcquirente != null) {
             for (Indirizzo ind : indirizziAcquirente) {
@@ -160,7 +187,8 @@ public class AccettaOffertaDialog extends JDialog {
         // Pannello INCONTRO IN UNI
         JPanel panelInUni = new JPanel();
         panelInUni.setLayout(new BoxLayout(panelInUni, BoxLayout.Y_AXIS));
-        panelInUni.setBorder(BorderFactory.createTitledBorder("Incontro in università"));
+        panelInUni.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(UITheme.BORDER_LIGHT), "Incontro in università"));
+        panelInUni.setBackground(UITheme.WHITE);
         panelInUni.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         txtDataIncontro = new JTextField();
@@ -190,8 +218,19 @@ public class AccettaOffertaDialog extends JDialog {
 
         // Bottoni
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttons.setBackground(UITheme.BACKGROUND_LIGHT);
         JButton btnAnnulla = new JButton("Annulla");
         JButton btnConferma = new JButton("Conferma");
+        btnConferma.setFocusable(false);
+        btnConferma.putClientProperty(com.formdev.flatlaf.FlatClientProperties.STYLE,
+            "arc: 12; background: #1B415D; foreground: #FFFFFF; hoverBackground: #2A5E86; pressedBackground: #163245;");
+        btnAnnulla.putClientProperty(com.formdev.flatlaf.FlatClientProperties.STYLE,
+            "arc: 12; background: #D93C25; foreground: #FFFFFF; hoverBackground: #B93522; pressedBackground: #8F2A1B;");
+        btnAnnulla.setFocusable(false);
+        btnAnnulla.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        btnAnnulla.setBorderPainted(false);
+        btnAnnulla.setContentAreaFilled(true);
+        btnAnnulla.setOpaque(false);
 
         buttons.add(btnAnnulla);
         buttons.add(btnConferma);

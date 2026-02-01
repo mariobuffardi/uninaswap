@@ -72,11 +72,11 @@ public class ReportView extends JPanel {
 
     public ReportView() {
         setLayout(new BorderLayout());
-        setBackground(SURFACE);
+        setBackground(UITheme.BACKGROUND_LIGHT);
         setBorder(new EmptyBorder(14, 14, 14, 14));
 
         JLabel title = new JLabel("Report", SwingConstants.LEFT);
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
+        title.setFont(new Font("SansSerif", Font.BOLD, 20));
         title.setForeground(TITLE);
 
         JPanel titleRow = new JPanel(new BorderLayout());
@@ -188,7 +188,7 @@ public class ReportView extends JPanel {
         lbl.setForeground(TITLE);
         lbl.setFont(lbl.getFont().deriveFont(Font.BOLD, 14f));
 
-        JButton btnBack = new JButton("Indietro");
+        JButton btnBack = new JButton("← Indietro");
         styleNavButton(btnBack);
         btnBack.addActionListener(e -> venditeCards.show(venditeRoot, "SUMMARY"));
 
@@ -277,7 +277,7 @@ public class ReportView extends JPanel {
         lbl.setForeground(TITLE);
         lbl.setFont(lbl.getFont().deriveFont(Font.BOLD, 14f));
 
-        JButton btnBack = new JButton("Indietro");
+        JButton btnBack = new JButton("← Indietro");
         styleNavButton(btnBack);
         btnBack.addActionListener(e -> acquistiCards.show(acquistiRoot, "SUMMARY"));
 
@@ -361,11 +361,11 @@ public class ReportView extends JPanel {
         p.setOpaque(false);
 
         JLabel lbl = new JLabel(text);
-        lbl.setForeground(TITLE);
+        lbl.setForeground(UITheme.PRIMARY_DARK);
         lbl.setFont(lbl.getFont().deriveFont(Font.BOLD, 14f));
 
         JSeparator sep = new JSeparator();
-        sep.setForeground(BORDER);
+        sep.setForeground(UITheme.BORDER_LIGHT);
 
         p.add(lbl, BorderLayout.NORTH);
         p.add(Box.createVerticalStrut(6), BorderLayout.CENTER);
@@ -429,8 +429,7 @@ public class ReportView extends JPanel {
 
     private void stylePrimaryButton(JButton b) {
         b.putClientProperty(FlatClientProperties.STYLE,
-                "arc: 12; background: #1B415D; foreground: #FFFFFF; " +
-                        "hoverBackground: #2A5E86; pressedBackground: #163245;");
+                "arc: 12; background: #1B415D; foreground: #FFFFFF; " + "hoverBackground: #2A5E86; pressedBackground: #163245;");
         b.setFocusable(false);
         b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
@@ -487,19 +486,18 @@ public class ReportView extends JPanel {
     }
 
     private void styleNavButton(JButton b) {
-        b.putClientProperty(FlatClientProperties.STYLE,
-                "arc: 12; " +
-                        "background: #EAF2F9; foreground: #1B415D; " +
-                        "hoverBackground: #DCEAF7; pressedBackground: #CFE3F5; " +
-                        "border: 1,1,1,1,#BFD3EA; " +
-                        "margin: 8,16,8,16;"); // padding interno (FlatLaf)
-        b.setFocusable(false);
+        b.setText("<html><u>" + b.getText().replaceAll("<[^>]*>", "") + "</u></html>");
+        b.setForeground(UITheme.PRIMARY);
         b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // dimensione minima così non resta striminzito
-        b.setPreferredSize(new Dimension(140, 38));
-        b.setMinimumSize(new Dimension(140, 38));
-        b.setFont(b.getFont().deriveFont(Font.BOLD, 12.5f));
+        b.setOpaque(false);
+        b.setContentAreaFilled(false);
+        b.setBorderPainted(false);
+        b.setFocusPainted(false);
+        b.setFocusable(false);
+        b.setHorizontalAlignment(SwingConstants.LEFT);
+        b.setBorder(new EmptyBorder(0,0,0,0));
+        b.setFont(b.getFont().deriveFont(Font.PLAIN, 13.5f));
     }
 
 

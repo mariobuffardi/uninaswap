@@ -191,9 +191,10 @@ public class LoginView extends JFrame {
 
         btnLogin = new JButton("Accedi");
         btnLogin.setAlignmentX(Component.LEFT_ALIGNMENT);
+        btnLogin.setFocusable(false);
         btnLogin.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
         btnLogin.putClientProperty(FlatClientProperties.STYLE,
-                "arc: 14; background: #1B415D; foreground: #FFFFFF; hoverBackground: #2A5E86; pressedBackground: #163245; focusWidth: 0;");
+                "arc: 14; background: #1B415D; foreground: #FFFFFF; hoverBackground: #D93C25; pressedBackground: #163245; focusWidth: 0;");
         form.add(btnLogin);
 
         card.add(form, BorderLayout.CENTER);
@@ -312,6 +313,7 @@ public class LoginView extends JFrame {
         card.add(scroll, BorderLayout.CENTER);
 
         btnRegister = new JButton("Registrati");
+        btnRegister.setFocusable(false);
         btnRegister.putClientProperty(FlatClientProperties.STYLE,
                 "arc: 14; background: #1B415D; foreground: #FFFFFF; hoverBackground: #D93C25; pressedBackground: #163245; focusWidth: 0;");
         btnRegister.setPreferredSize(new Dimension(10, 44));

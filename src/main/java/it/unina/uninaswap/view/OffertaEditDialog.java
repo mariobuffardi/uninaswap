@@ -2,10 +2,14 @@ package it.unina.uninaswap.view;
 
 import it.unina.uninaswap.model.entity.Annuncio;
 import it.unina.uninaswap.model.entity.Offerta;
+import it.unina.uninaswap.util.UITheme;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+
+import com.formdev.flatlaf.FlatClientProperties;
+
 import java.awt.*;
 import java.math.BigDecimal;
 
@@ -28,7 +32,7 @@ public class OffertaEditDialog extends JDialog {
     private Offerta editedOfferta;
 
     public OffertaEditDialog(JFrame parent, Offerta offerta, Annuncio annuncio) {
-        super(parent, "Modifica offerta", true);
+        super(parent, computeDialogTitle(offerta, annuncio), true);
         this.originalOfferta = offerta;
         this.annuncio = annuncio;
 
@@ -42,16 +46,18 @@ public class OffertaEditDialog extends JDialog {
 
 
         // HEADER
+        String headerTitleText = computeDialogTitle(originalOfferta, this.annuncio);
         JPanel header = new JPanel(new BorderLayout(0, 6));
-        JLabel title = new JLabel("Modifica offerta");
-        title.setFont(title.getFont().deriveFont(Font.BOLD, title.getFont().getSize() + 2f));
+        JLabel title = new JLabel(headerTitleText);
+        title.setFont(new Font("SansSerif", Font.BOLD, 16));
+        title.setForeground(UITheme.PRIMARY_DARK);
 
         JLabel subtitle = new JLabel(
-                "<html><b>Annuncio:</b> " + safe(annuncio.getTitolo()) +
-                        " &nbsp; <span style='color:gray'>( " + safe(annuncio.getTipologia()) + " )</span></html>"
+                "<html><b>Annuncio:</b> " + safe(this.annuncio != null ? this.annuncio.getTitolo() : null) +
+                " &nbsp; <span style='color:gray'>( " + safe(this.annuncio != null ? this.annuncio.getTipologia() : null) + " )</span></html>"
         );
-        subtitle.setForeground(new Color(60, 60, 60));
-
+        subtitle.setForeground(UITheme.TEXT_SECONDARY);
+        
         header.add(title, BorderLayout.NORTH);
         header.add(subtitle, BorderLayout.CENTER);
         root.add(header, BorderLayout.NORTH);
@@ -60,6 +66,7 @@ public class OffertaEditDialog extends JDialog {
         // FORM
         JPanel form = new JPanel(new GridBagLayout());
         form.setBorder(new EmptyBorder(10, 0, 10, 0));
+        root.setBackground(UITheme.BACKGROUND_LIGHT);
         root.add(form, BorderLayout.CENTER);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -98,15 +105,27 @@ public class OffertaEditDialog extends JDialog {
 
         // BUTTONS
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        buttons.setBackground(UITheme.BACKGROUND_LIGHT);
         JButton btnAnnulla = new JButton("Annulla");
-        JButton btnSalva = new JButton("Salva");
+        boolean isEdit = (originalOfferta != null && originalOfferta.getId() > 0);
+        JButton btnConferma = new JButton(isEdit ? "Salva" : "Invia");
+        btnConferma.putClientProperty(FlatClientProperties.STYLE,
+            "arc: 12; background: #1B415D; foreground: #FFFFFF; hoverBackground: #2A5E86; pressedBackground: #163245;");
+        btnConferma.setFocusable(false);
+        btnAnnulla.putClientProperty(FlatClientProperties.STYLE,
+            "arc: 12; background: #D93C25; foreground: #FFFFFF; hoverBackground: #B93522; pressedBackground: #8F2A1B;");
+        btnAnnulla.setFocusable(false);
+        btnAnnulla.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
+        btnAnnulla.setBorderPainted(false);
+        btnAnnulla.setContentAreaFilled(true);
+        btnAnnulla.setOpaque(false);
         root.add(buttons, BorderLayout.PAGE_END);
 
         buttons.add(btnAnnulla);
-        buttons.add(btnSalva);
 
-        getRootPane().setDefaultButton(btnSalva);
-
+        buttons.add(btnConferma);
+        getRootPane().setDefaultButton(btnConferma);
+        
         prefillFields();
         applyTipologiaUI();
 
@@ -116,12 +135,29 @@ public class OffertaEditDialog extends JDialog {
             dispose();
         });
 
-        btnSalva.addActionListener(e -> onSave());
+        btnConferma.addActionListener(e -> onSave());
 
         pack();
         setMinimumSize(new Dimension(560, getPreferredSize().height));
         setLocationRelativeTo(parent);
     }
+    
+
+
+
+     // Titolo coerente con l'azione
+    private static String computeDialogTitle(Offerta offerta, Annuncio annuncio) {
+        boolean isEdit = (offerta != null && offerta.getId() > 0);
+        if (isEdit) return "Modifica offerta";
+
+        String tipo = (annuncio != null) ? annuncio.getTipologia() : null;
+        if ("Vendita".equalsIgnoreCase(tipo)) return "Fai un'offerta";
+        if ("Scambio".equalsIgnoreCase(tipo)) return "Proponi scambio";
+        if ("Regalo".equalsIgnoreCase(tipo)) return "Richiedi";
+
+        return "Nuova offerta";
+    }
+
 
     private JPanel buildRow(String label, Component field) {
         JPanel p = new JPanel(new BorderLayout(8, 0));
@@ -172,6 +208,13 @@ public class OffertaEditDialog extends JDialog {
 
     private void onSave() {
         try {
+            if (originalOfferta == null) {
+                JOptionPane.showMessageDialog(this,
+                        "Errore interno: offerta non inizializzata.",
+                        "Errore", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             String tipo = (annuncio != null) ? annuncio.getTipologia() : null;
 
             boolean vendita = "Vendita".equalsIgnoreCase(tipo);
@@ -182,7 +225,6 @@ public class OffertaEditDialog extends JDialog {
             String msg = (txtMessaggio.getText() != null) ? txtMessaggio.getText().trim() : "";
             String obj = (txtOggettoOfferto.getText() != null) ? txtOggettoOfferto.getText().trim() : "";
 
-            BigDecimal nuovoImporto = null;
 
             if (vendita) {
                 if (sImporto.isBlank()) {
@@ -191,7 +233,7 @@ public class OffertaEditDialog extends JDialog {
                             "Errore", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                nuovoImporto = new BigDecimal(sImporto);
+                BigDecimal nuovoImporto = new BigDecimal(sImporto);
                 if (nuovoImporto.compareTo(BigDecimal.ZERO) < 0) {
                     JOptionPane.showMessageDialog(this,
                             "L'importo non può essere negativo.",

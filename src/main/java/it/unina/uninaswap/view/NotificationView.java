@@ -134,7 +134,6 @@ public class NotificationView extends JPanel {
         inviateAccSection.add(inviateAccettatePanel, BorderLayout.CENTER);
         mainPanel.add(inviateAccSection);
         
-        // Listener width
         scrollPane.getViewport().addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
@@ -142,14 +141,12 @@ public class NotificationView extends JPanel {
             }
         });
 
-        // Trigger iniziale
         SwingUtilities.invokeLater(this::updateColsAndRelayout);
     }
 
 
     private void styleInnerPanel(JPanel p) {
-        // layout set dynamically
-        p.setOpaque(false); // transparent to show section background
+        p.setOpaque(false); 
         p.setBorder(new EmptyBorder(6, 6, 6, 6));
     }
 
@@ -170,7 +167,6 @@ public class NotificationView extends JPanel {
     }
 
     
-    // Data setters 
     public void setOfferteRicevute(List<OffertaNotificationData> list) {
         this.offerteRicevute = (list == null) ? new ArrayList<>() : new ArrayList<>(list);
         refreshRicevute();
@@ -232,7 +228,7 @@ public class NotificationView extends JPanel {
     }
 
     
-    // CARD COMPATTA (ANTEPRIMA)
+
     private JPanel createCompactCard(OffertaNotificationData data, boolean ricevuta) {
         JPanel card = new JPanel();
         card.setLayout(new BorderLayout(8, 6));
@@ -245,7 +241,6 @@ public class NotificationView extends JPanel {
         card.setMinimumSize(fixed);
         card.setMaximumSize(fixed);
 
-        // TOP
         JPanel top = new JPanel();
         top.setOpaque(false);
         top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
@@ -269,7 +264,6 @@ public class NotificationView extends JPanel {
 
         card.add(top, BorderLayout.NORTH);
 
-        // CENTER
         JPanel center = new JPanel();
         center.setOpaque(false);
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
@@ -280,7 +274,6 @@ public class NotificationView extends JPanel {
         lblUser.setForeground(TITLE);
         center.add(lblUser);
         
-        // Importo
         if (data.getImportoDisplay() != null) {
             String imp = data.getImportoDisplay().trim();
             if (!imp.isEmpty() && !imp.equals("-") && !imp.equals("- €")) {
@@ -291,7 +284,6 @@ public class NotificationView extends JPanel {
                 }
         }
 
-        // Oggetto offerto 
         Offerta off = data.getOfferta();
         if (off != null && off.getOggettoOfferto() != null && !off.getOggettoOfferto().trim().isEmpty()) {
             JLabel lblObj = new JLabel("Offre: " + off.getOggettoOfferto().trim());
@@ -299,15 +291,17 @@ public class NotificationView extends JPanel {
             center.add(lblObj);
             }
 
-        // Prima riga del messaggio
 
 
         if (!ricevuta && off != null && off.getStato() != null && "Accettata".equals(off.getStato().name())) {
             boolean can = (inviataListener != null) && inviataListener.canLasciaRecensione(off);
             if (can) {
             	JButton btnRec = new JButton("Lascia una recensione");
-            	btnRec.putClientProperty(FlatClientProperties.STYLE, "arc: 10; padding: 2,8,2,8; background: #EAF2F9; foreground: #1B415D; hoverBackground: #D7E3F2;");
+            	btnRec.putClientProperty(FlatClientProperties.STYLE,
+            			 "arc: 12; background: #1B415D; foreground: #FFFFFF; hoverBackground: #2A5E86; pressedBackground: #163245;");
             	btnRec.setBorderPainted(false);
+                btnRec.setFocusable(false);
+                btnRec.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             	btnRec.addActionListener(e -> {
                     if (inviataListener != null)
                         inviataListener.onLasciaRecensione(off);
@@ -322,9 +316,11 @@ public class NotificationView extends JPanel {
 
         // Click interaction
         // Se ricevuta e accettata -> no action. Altrimenti -> apri dialog
+        // Se inviata e accettata -> nessuna interazione sulla card (solo tasto recensione cliccabile)
         boolean isRicAcc = (ricevuta && off != null && off.getStato() != null && "Accettata".equals(off.getStato().name()));
+        boolean isInvAcc = (!ricevuta && off != null && off.getStato() != null && "Accettata".equals(off.getStato().name()));
 
-        if (!isRicAcc) {
+        if (!isRicAcc && !isInvAcc) {
             card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             card.addMouseListener(new MouseAdapter() {
                 @Override

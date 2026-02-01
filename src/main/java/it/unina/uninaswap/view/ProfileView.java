@@ -49,7 +49,6 @@ public class ProfileView extends JPanel {
     private static final int REC_CARD_W = 260;
     private static final int REC_CARD_H = 220;
 
-    // path stellina
     private static final String STAR_PATH = "/images/altro/star.jpg";
 
     private static final Color SURFACE = Color.decode("#EAF2F9");   
@@ -76,14 +75,11 @@ public class ProfileView extends JPanel {
 
     private Studente currentStudente;
 
-    // stato annunci
     private List<Annuncio> mieiAnnunci = new ArrayList<>();
 
-    // stato recensioni
     private List<RecensioneCardData> mieRecensioni = new ArrayList<>();
-    private ImageIcon starIcon; // cache stellina
+    private ImageIcon starIcon; 
 
-    // listener click/modifica/elimina su annuncio
     public interface AnnuncioClickListener {
         void onAnnuncioClick(Annuncio annuncio);
     }
@@ -118,13 +114,11 @@ public class ProfileView extends JPanel {
         scrollPane.setBackground(SURFACE);
         add(scrollPane, BorderLayout.CENTER);
 
-        // FOTO PROFILO 
         lblFotoProfilo = new JLabel();
         lblFotoProfilo.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(lblFotoProfilo);
         mainPanel.add(Box.createVerticalStrut(14));
 
-        // titolo
         JLabel lblTitoloInfo = new JLabel("Informazioni studente");
         lblTitoloInfo.setForeground(TITLE);
         lblTitoloInfo.setFont(lblTitoloInfo.getFont().deriveFont(Font.BOLD, 18f));
@@ -132,7 +126,6 @@ public class ProfileView extends JPanel {
         mainPanel.add(lblTitoloInfo);
         mainPanel.add(Box.createVerticalStrut(10));
 
-        // info (lasciamo la struttura, ma le mettiamo in una "card" moderna)
         JPanel infoCard = new JPanel(new BorderLayout());
         infoCard.setOpaque(true);
         infoCard.setBackground(Color.WHITE);
@@ -208,7 +201,6 @@ public class ProfileView extends JPanel {
 
         mainPanel.add(recensioniSection);
 
-        // set iniziale
         setStudente(studenteLoggato);
     }
 
@@ -233,7 +225,6 @@ public class ProfileView extends JPanel {
         return section;
     }
 
-    // Listener setters
     public void setAnnuncioClickListener(AnnuncioClickListener listener) {
         this.annuncioClickListener = listener;
     }

@@ -52,11 +52,9 @@ public class AnnunciListView extends JPanel {
             "background: #FFFFFF; " +
             "border: 1,1,1,1,#D7E3F2;";
 
-    // pannello che contiene tutte le card
     private JPanel cardsPanel;
     private JScrollPane scrollPane;
 
-    // listener click su annuncio
     public interface AnnuncioClickListener {
         void onAnnuncioClick(Annuncio annuncio);
     }
@@ -120,7 +118,6 @@ public class AnnunciListView extends JPanel {
         cardsPanel.removeAll();
 
         if (annunci == null || annunci.isEmpty()) {
-            // vista vuota più carina
             JPanel empty = new JPanel(new BorderLayout());
             empty.setOpaque(false);
             empty.setBorder(new EmptyBorder(30, 10, 10, 10));
@@ -151,17 +148,12 @@ public class AnnunciListView extends JPanel {
         cardsPanel.repaint();
     }
 
-    /**
-     * Wrapper trasparente che centra una card di dimensione fissa dentro la cella
-     * GridLayout.
-     * Così la card resta sempre CARD_W x CARD_H.
-     */
+
     private JComponent wrapFixedCard(JPanel card, Annuncio annuncio) {
         JPanel cell = new JPanel(new GridBagLayout());
         cell.setOpaque(false);
         cell.add(card);
 
-        // click anche se clicchi nel vuoto della cella
         cell.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         cell.addMouseListener(new MouseAdapter() {
             @Override
@@ -170,7 +162,6 @@ public class AnnunciListView extends JPanel {
                 if (deep instanceof JButton)
                     return;
 
-                // se clicchi dentro la card ok, se clicchi fuori uguale
                 if (annuncioClickListener != null) {
                     annuncioClickListener.onAnnuncioClick(annuncio);
                 }
@@ -185,16 +176,14 @@ public class AnnunciListView extends JPanel {
         card.setOpaque(true);
         card.setBackground(CARD_BG);
 
-        // FlatLaf: angoli arrotondati + bordo soft
         card.putClientProperty(FlatClientProperties.STYLE, CARD_STYLE);
 
-        // dimensione fissa (come richiesto)
         Dimension fixed = new Dimension(CARD_W, CARD_H);
         card.setPreferredSize(fixed);
         card.setMinimumSize(fixed);
         card.setMaximumSize(fixed);
 
-        // ===== FOTO =====
+        // FOTO 
         JPanel photoWrap = new JPanel(new BorderLayout());
         photoWrap.setOpaque(false);
         photoWrap.setBorder(new EmptyBorder(12, 12, 6, 12));
@@ -263,6 +252,7 @@ public class AnnunciListView extends JPanel {
             });
 
             JButton btnOfferta = new JButton("Fai offerta");
+            btnOfferta.setFocusable(false);
             stylePrimaryButton(btnOfferta);
             btnOfferta.addActionListener(e -> {
                 if (annuncioOffertaListener != null) {
@@ -296,7 +286,7 @@ public class AnnunciListView extends JPanel {
 
         card.add(actions, BorderLayout.SOUTH);
 
-        // ===== CLICK sulla card (non sui bottoni) =====
+        // CLICK sulla card (non sui bottoni)
         card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         card.addMouseListener(new MouseAdapter() {
             @Override
@@ -312,7 +302,6 @@ public class AnnunciListView extends JPanel {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                // leggero hover (bordo un filo più “presente”)
                 card.putClientProperty(FlatClientProperties.STYLE,
                         "arc: 20; background: #FFFFFF; border: 1,1,1,1,#BFD3EA;");
                 card.repaint();
@@ -340,51 +329,10 @@ private void stylePrimaryButton(JButton b) {
     b.setFocusable(false);
 }
 
-private void styleSecondaryButton(JButton b) {
-    b.putClientProperty(FlatClientProperties.STYLE,
-            "arc: 12; " +
-            "background: #EAF2F9; foreground: #1B415D; " +
-            "hoverBackground: #DCEAF7; pressedBackground: #CFE3F5; " +
-            "border: 1,1,1,1,#BFD3EA;");
-    b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-    // niente focus ring
-    b.setFocusPainted(false);
-    b.setFocusable(false);
-}
-
-
-
-    // (rimasta per compatibilità)
-    private ImageIcon getDefaultIconForCategoria(String categoria) {
-        String path;
-        switch (categoria) {
-            case "Strumenti_musicali":
-                path = "/images/categories/strumenti.png";
-                break;
-            case "Libri":
-                path = "/images/categories/libri.jpg";
-                break;
-            case "Informatica":
-                path = "/images/categories/informatica.jpg";
-                break;
-            case "Abbigliamento":
-                path = "/images/categories/abbigliamento.jpg";
-                break;
-            case "Arredo":
-                path = "/images/categories/arredo.jpg";
-                break;
-            default:
-                path = "/images/categories/altro.jpg";
-                break;
-        }
-        return new ImageIcon(getClass().getResource(path));
-    }
-
     private int currentCols = -1;
 
     private int computeCols(int viewportWidth) {
-        int available = viewportWidth - 30; // conservativo (padding + scrollbar)
+        int available = viewportWidth - 30; 
         int colWidth = CARD_W + HGAP;
         int cols = available / colWidth;
         return Math.max(1, cols);

@@ -39,6 +39,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.formdev.flatlaf.FlatClientProperties;
+
 import it.unina.uninaswap.model.entity.Annuncio;
 import it.unina.uninaswap.model.entity.Foto;
 import it.unina.uninaswap.model.entity.Studente;
@@ -99,10 +101,12 @@ public class AnnuncioCreateDialog extends JDialog {
 
     private void buildUI() {
         JPanel content = new JPanel(new BorderLayout());
-        content.setBorder(new EmptyBorder(10, 10, 10, 10));
+        content.setBorder(new EmptyBorder(14, 14, 14, 14));
+        content.setBackground(UITheme.BACKGROUND_LIGHT);
         setContentPane(content);
 
         JPanel form = new JPanel(new GridBagLayout());
+        form.setOpaque(false);
         content.add(form, BorderLayout.CENTER);
 
         GridBagConstraints c = new GridBagConstraints();
@@ -117,8 +121,11 @@ public class AnnuncioCreateDialog extends JDialog {
         // Titolo
         c.gridx = 0;
         c.gridy = row;
-        form.add(new JLabel("Titolo*"), c);
-
+        JLabel lblTitolo = new JLabel("Titolo*");
+        lblTitolo.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblTitolo.setForeground(UITheme.PRIMARY_DARK);
+        form.add(lblTitolo, c);
+        
         c.gridx = 1;
         c.gridy = row;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -132,8 +139,10 @@ public class AnnuncioCreateDialog extends JDialog {
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = row;
-        form.add(new JLabel("Tipologia*"), c);
-
+        JLabel lblTipologia = new JLabel("Tipologia*");
+        lblTipologia.setForeground(UITheme.TEXT_SECONDARY);
+        form.add(lblTipologia, c);
+        
         c.gridx = 1;
         c.gridy = row;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -147,8 +156,10 @@ public class AnnuncioCreateDialog extends JDialog {
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = row;
-        form.add(new JLabel("Categoria*"), c);
-
+        JLabel lblCategoria = new JLabel("Categoria*");
+        lblCategoria.setForeground(UITheme.TEXT_SECONDARY);
+        form.add(lblCategoria, c);
+        
         c.gridx = 1;
         c.gridy = row;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -169,8 +180,10 @@ public class AnnuncioCreateDialog extends JDialog {
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = row;
-        form.add(new JLabel("Prezzo (€)"), c);
-
+        JLabel lblPrezzo = new JLabel("Prezzo (€)");
+        lblPrezzo.setForeground(UITheme.TEXT_SECONDARY);
+        form.add(lblPrezzo, c);
+        
         c.gridx = 1;
         c.gridy = row;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -184,8 +197,10 @@ public class AnnuncioCreateDialog extends JDialog {
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = row;
-        form.add(new JLabel("Oggetto richiesto"), c);
-
+        JLabel lblOggetto = new JLabel("Oggetto richiesto");
+        lblOggetto.setForeground(UITheme.TEXT_SECONDARY);
+        form.add(lblOggetto, c);
+        
         c.gridx = 1;
         c.gridy = row;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -199,8 +214,10 @@ public class AnnuncioCreateDialog extends JDialog {
         c.weightx = 0;
         c.gridx = 0;
         c.gridy = row;
-        form.add(new JLabel("Consegna*"), c);
-
+        JLabel lblConsegna = new JLabel("Consegna*");
+        lblConsegna.setForeground(UITheme.TEXT_SECONDARY);
+        form.add(lblConsegna, c);
+        
         c.gridx = 1;
         c.gridy = row;
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -220,8 +237,10 @@ public class AnnuncioCreateDialog extends JDialog {
         c.fill = GridBagConstraints.NONE;
         c.weightx = 0;
         c.weighty = 0;
-        form.add(new JLabel("Descrizione"), c);
-
+        JLabel lblDescrizione = new JLabel("Descrizione");
+        lblDescrizione.setForeground(UITheme.TEXT_SECONDARY);
+        form.add(lblDescrizione, c);
+        
         c.gridx = 1;
         c.gridy = row;
         c.anchor = GridBagConstraints.CENTER;
@@ -253,9 +272,19 @@ public class AnnuncioCreateDialog extends JDialog {
 
         // Bottoni
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 8));
+        buttons.setBackground(it.unina.uninaswap.util.UITheme.BACKGROUND_LIGHT);
         btnAnnulla = new JButton("Annulla");
         btnCrea = new JButton("Crea");
-        btnCrea.putClientProperty("JButton.buttonType", "default");
+        btnCrea.putClientProperty(FlatClientProperties.STYLE,
+                "arc: 12; background: #1B415D; foreground: #FFFFFF; hoverBackground: #2A5E86; pressedBackground: #163245;");
+        btnAnnulla.putClientProperty(FlatClientProperties.STYLE,
+                "arc: 12; background: #D93C25; foreground: #FFFFFF; hoverBackground: #B93522; pressedBackground: #8F2A1B;");
+        btnAnnulla.setFocusable(false);
+        btnCrea.setFocusable(false);
+        btnAnnulla.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnAnnulla.setBorderPainted(false);
+        btnAnnulla.setContentAreaFilled(true);
+        btnAnnulla.setOpaque(false);        
         buttons.add(btnAnnulla);
         buttons.add(btnCrea);
         content.add(buttons, BorderLayout.SOUTH);
@@ -297,6 +326,7 @@ public class AnnuncioCreateDialog extends JDialog {
 
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         btnAggiungiFoto = new JButton("Aggiungi foto...");
+        btnAggiungiFoto.setFocusable(false);
         actions.add(btnAggiungiFoto);
         p.add(actions, BorderLayout.SOUTH);
 
@@ -341,6 +371,7 @@ public class AnnuncioCreateDialog extends JDialog {
         btnRemove.setPreferredSize(new Dimension(26, 26));
         btnRemove.setMargin(new Insets(0, 0, 0, 0));
         btnRemove.setFocusPainted(false);
+        btnRemove.setFocusable(false);
         btnRemove.setBackground(new Color(220, 53, 69));
         btnRemove.setForeground(Color.WHITE);
         btnRemove.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 1));
