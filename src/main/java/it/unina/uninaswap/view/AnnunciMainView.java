@@ -23,6 +23,7 @@ public class AnnunciMainView extends JFrame {
 
     private JPanel topBar;
     private JPanel topBarPanelWest;
+    private JPanel topBarPanelEast;
 
     private JPanel searchBarWrap;
     private JPanel searchBarPanel;
@@ -65,7 +66,7 @@ public class AnnunciMainView extends JFrame {
 
     public AnnunciMainView(Studente studenteLoggato) {
         setTitle("UniNaSwap");
-        setMinimumSize(new Dimension(1000, 750));
+        setSize(1000, 750);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -77,12 +78,10 @@ public class AnnunciMainView extends JFrame {
             System.err.println("Logo non trovato: " + e.getMessage());
         }
 
+        // Header
         getContentPane().setLayout(new BorderLayout(0, 0));
         getContentPane().setBackground(SURFACE);
 
-        JPanel northContainer = new JPanel(new BorderLayout());
-        northContainer.setBackground(SURFACE);
-        getContentPane().add(northContainer, BorderLayout.NORTH);
 
         topBar = new JPanel(new BorderLayout(0, 0));
         topBar.setBackground(PRIMARY);
@@ -90,10 +89,12 @@ public class AnnunciMainView extends JFrame {
                 BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(0, 0, 0, 60)),
                 new EmptyBorder(10, 12, 10, 12)
         ));
-        northContainer.add(topBar, BorderLayout.NORTH);
+        getContentPane().add(topBar, BorderLayout.NORTH);
+
 
         topBarPanelWest = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         topBarPanelWest.setOpaque(false);
+        topBarPanelWest.setPreferredSize(new Dimension(100, TOP_BUTTON_PX));
         topBar.add(topBarPanelWest, BorderLayout.WEST);
 
         hamburgerMenuButton = createTopIconButton("/images/menuIcons/hamburgerMenu.png", TOP_ICON_PX, TOP_BUTTON_PX);
@@ -119,9 +120,10 @@ public class AnnunciMainView extends JFrame {
         } catch (Exception ignored) {
         }
 
-        // Search Bar
-        buildSearchBar();
-        northContainer.add(searchBarWrap, BorderLayout.SOUTH);
+        topBarPanelEast = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        topBarPanelEast.setOpaque(false);
+        topBarPanelEast.setPreferredSize(new Dimension(100, TOP_BUTTON_PX)); // Stessa larghezza di West
+        topBar.add(topBarPanelEast, BorderLayout.EAST);
 
         // Menu Laterale
         menuBar = new AnnunciMenuPanel();
@@ -130,26 +132,33 @@ public class AnnunciMainView extends JFrame {
         menuWrap.setBorder(new EmptyBorder(10, MENU_WRAP_LEFT_PAD, 10, 0));
         menuWrap.add(menuBar, BorderLayout.CENTER);
         getContentPane().add(menuWrap, BorderLayout.WEST);
+        JPanel contentWrapper = new JPanel(new BorderLayout());
+        contentWrapper.setBackground(SURFACE);
+        getContentPane().add(contentWrapper, BorderLayout.CENTER);
 
-        // Filter Panel
+        // Search Bar
+        buildSearchBar();
+        contentWrapper.add(searchBarWrap, BorderLayout.NORTH);
+
+
+        // Pannello Filtri
         filterPanel = new AnnunciFilterPanel();
         JPanel filterWrap = new JPanel(new BorderLayout());
         filterWrap.setBackground(SURFACE);
         filterWrap.setBorder(new EmptyBorder(10, 0, 10, FILTER_WRAP_RIGHT_PAD));
         filterWrap.add(filterPanel, BorderLayout.CENTER);
-        getContentPane().add(filterWrap, BorderLayout.EAST);
-
+        contentWrapper.add(filterWrap, BorderLayout.EAST);
 
         filterPanel.bindTopSearchControls(txtSearchTop, cmbCategoriaTop);
-
         btnSearchTop.addActionListener(e -> filterPanel.getBtnCerca().doClick());
         txtSearchTop.addActionListener(e -> filterPanel.getBtnCerca().doClick());
 
+        // Layout Annunci
         centerLayout = new CardLayout();
         centerPanel = new JPanel(centerLayout);
         centerPanel.setBackground(SURFACE);
         centerPanel.setBorder(null);
-        getContentPane().add(centerPanel, BorderLayout.CENTER);
+        contentWrapper.add(centerPanel, BorderLayout.CENTER);
 
         annunciListView = new AnnunciListView();
         profileView = new ProfileView(studenteLoggato);
@@ -168,7 +177,7 @@ public class AnnunciMainView extends JFrame {
         JPanel bottomPanel = new JPanel();
         bottomPanel.setBackground(SURFACE);
         bottomPanel.setBorder(new EmptyBorder(0, 0, 6, 0));
-        getContentPane().add(bottomPanel, BorderLayout.SOUTH);
+        contentWrapper.add(bottomPanel, BorderLayout.SOUTH);
 
         showAnnunciView();
 
@@ -180,8 +189,6 @@ public class AnnunciMainView extends JFrame {
         });
 
         SwingUtilities.invokeLater(this::resizeSidePanels);
-        
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
     private void buildSearchBar() {
@@ -234,7 +241,7 @@ public class AnnunciMainView extends JFrame {
         cmbCategoriaTop.putClientProperty(FlatClientProperties.STYLE,
                 "arc: 18; background: #FFFFFF; border: 0,0,0,0;");
 
-        // Button Cerca
+        // Bottone Cerca
         btnSearchTop = createPrimaryPillTextButton("Cerca", new Dimension(110, SEARCH_H));
 
         JSeparator sep1 = new JSeparator(SwingConstants.VERTICAL);
