@@ -167,7 +167,7 @@ public class LoginView extends JFrame {
         checkIncontro.setBackground(Color.WHITE);
 
         JLabel lblPreferenza = new JLabel("Preferenza Spedizione");
-        lblPreferenza.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        lblPreferenza.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblPreferenza.setForeground(UITheme.TEXT_SECONDARY);
         lblPreferenza.setAlignmentX(Component.LEFT_ALIGNMENT);
         formContent.add(Box.createVerticalStrut(5));
@@ -211,11 +211,11 @@ public class LoginView extends JFrame {
         pnlOverlay.setBackground(UITheme.PRIMARY);
 
         JPanel cardToReg = createOverlayContent("Ciao Studente!",
-                "Non hai un account? Registrati ora.", "VAI ALLA REGISTRAZIONE");
+                "Non hai un account? Registrati ora ed entra a far parte della nostra community!", "VAI ALLA REGISTRAZIONE");
         btnOverlayToRegister = (JButton) cardToReg.getClientProperty("btnAction");
 
         JPanel cardToLog = createOverlayContent("Bentornato!",
-                "Hai già un account? Accedi.", "TORNA AL LOGIN");
+                "Fai già parte della nostra community? Effettua subito il login!", "TORNA AL LOGIN");
         btnOverlayToLogin = (JButton) cardToLog.getClientProperty("btnAction");
 
         pnlOverlay.add(cardToReg, "TO_REGISTER");
@@ -239,12 +239,12 @@ public class LoginView extends JFrame {
         gbc.insets = new Insets(10, 30, 10, 30);
 
         JLabel lblT = new JLabel(title);
-        lblT.setFont(new Font("SansSerif", Font.BOLD, 28));
+        lblT.setFont(new Font("Segoe UI", Font.BOLD, 28));
         lblT.setForeground(Color.WHITE);
         p.add(lblT, gbc);
 
         JTextArea txtDesc = new JTextArea(desc);
-        txtDesc.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        txtDesc.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtDesc.setForeground(new Color(230, 230, 230));
         txtDesc.setOpaque(false);
         txtDesc.setEditable(false);
@@ -257,7 +257,7 @@ public class LoginView extends JFrame {
         btn.setBorderPainted(true);
         btn.setFocusPainted(false);
         btn.setForeground(UITheme.PRIMARY);
-        btn.setFont(new Font("SansSerif", Font.BOLD, 12));
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.putClientProperty(FlatClientProperties.STYLE,
                 "arc: 50; " +
