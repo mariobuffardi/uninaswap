@@ -1,5 +1,17 @@
 package it.unina.uninaswap.controller;
 
+import java.awt.Image;
+import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+
 import it.unina.uninaswap.dao.AnnuncioDAO;
 import it.unina.uninaswap.dao.FotoDAO;
 import it.unina.uninaswap.dao.StudenteDAO;
@@ -11,15 +23,6 @@ import it.unina.uninaswap.view.AnnunciMainView;
 import it.unina.uninaswap.view.AnnuncioCreateDialog;
 import it.unina.uninaswap.view.AnnuncioDetailView;
 import it.unina.uninaswap.view.AnnuncioEditDialog;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 public class AnnunciController {
 
@@ -261,20 +264,19 @@ public class AnnunciController {
             if (!dialog.isConfirmed())
                 return;
 
-            Annuncio created = dialog.getCreatedAnnuncio();
+            // Validazione e costruzione Annuncio
+            Annuncio created = validateAndBuildAnnuncio(dialog);
             if (created == null)
                 return;
 
-            annuncioDAO.insert(created); // created ha già l'id valorizzato
+            // Costruzione lista foto 
+            List<Foto> fotos = buildFotoListFromDialog(dialog);
+
+            annuncioDAO.insert(created); 
 
             // SALVATAGGIO FOTO
-            List<Foto> fotos = dialog.getCreatedFotoList();
             if (fotos != null && !fotos.isEmpty()) {
-                // IMPORTANTE: con trigger DB che assegna la principale se manca,
-                // inseriamo PRIMA la foto principale (ordinamento) per evitare violazione
-                // unicità.
                 fotos.sort(java.util.Comparator.comparing(Foto::isPrincipale).reversed());
-                // Safety: al massimo una principale
                 boolean foundPrincipale = false;
                 for (Foto x : fotos) {
                     if (!x.isPrincipale())
@@ -374,5 +376,122 @@ public class AnnunciController {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(view, "Errore eliminazione annuncio:\n" + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+
+
+    private Annuncio validateAndBuildAnnuncio(AnnuncioCreateDialog dialog) {
+        String titolo = dialog.getTitolo();
+        if (titolo.isEmpty()) {
+            dialog.showError("Inserisci un titolo.");
+            return null;
+        }
+
+        String tipologia = dialog.getTipologia();
+        String categoria = dialog.getCategoria();
+
+        if (tipologia == null || categoria == null) {
+            dialog.showError("Seleziona tipologia e categoria.");
+            return null;
+        }
+
+        if (!dialog.isSpedizioneSelected() && !dialog.isInUniSelected()) {
+            dialog.showError("Seleziona almeno una modalità di consegna (spedizione o incontro in uni).");
+            return null;
+        }
+
+        BigDecimal prezzo = null;
+        if ("Vendita".equals(tipologia)) {
+            String prezzoText = dialog.getPrezzoText();
+            if (prezzoText.isEmpty()) {
+                dialog.showError("Per gli annunci di vendita il prezzo è obbligatorio.");
+                return null;
+            }
+            try {
+                prezzoText = prezzoText.replace(",", ".");
+                prezzo = new BigDecimal(prezzoText);
+                if (prezzo.compareTo(BigDecimal.ZERO) < 0)
+                    throw new NumberFormatException();
+            } catch (NumberFormatException ex) {
+                dialog.showError("Prezzo non valido. Usa un numero ≥ 0 (es. 10 o 10.50).");
+                return null;
+            }
+        }
+
+        String oggettoRich = null;
+        if ("Scambio".equals(tipologia)) {
+            oggettoRich = dialog.getOggettoRichiesto();
+            if (oggettoRich.isEmpty()) {
+                dialog.showError("Per gli annunci di scambio specifica l'oggetto richiesto.");
+                return null;
+            }
+        }
+
+        // Copia fisica delle foto selezionate
+        for (AnnuncioCreateDialog.FotoData fd : dialog.getFotoDataList()) {
+            try {
+                ImageUtil.copyToAnnunciDirs(fd.getSourceFile(), fd.getDestinationFilename());
+            } catch (Exception ex) {
+                dialog.showError("Errore copia foto:\n" + ex.getMessage());
+                return null;
+            }
+        }
+
+        // Build annuncio
+        Annuncio a = new Annuncio();
+        a.setTitolo(titolo);
+
+        String descr = dialog.getDescrizione();
+        a.setDescrizione(descr.isEmpty() ? null : descr);
+
+        a.setTipologia(tipologia);
+        a.setCategoria(categoria);
+        a.setOggettoRichiesto(oggettoRich);
+        a.setConcluso(false);
+        a.setPrezzo(prezzo);
+
+        a.setOffreSpedizione(dialog.isSpedizioneSelected());
+        a.setOffreIncontroInUni(dialog.isInUniSelected());
+
+        Studente venditore = dialog.getVenditore();
+        if (venditore != null) {
+            a.setMatricolaVenditore(venditore.getMatricola());
+        }
+
+        return a;
+    }
+
+
+    private List<Foto> buildFotoListFromDialog(AnnuncioCreateDialog dialog) {
+        List<AnnuncioCreateDialog.FotoData> fotoDataList = dialog.getFotoDataList();
+        List<Foto> fotoList = new ArrayList<>();
+
+        // Prima la foto principale
+        for (AnnuncioCreateDialog.FotoData fd : fotoDataList) {
+            if (!fd.isPrincipale())
+                continue;
+            Foto f = new Foto();
+            f.setPath("images/annunci/" + fd.getDestinationFilename());
+            f.setPrincipale(true);
+            fotoList.add(f);
+            break;
+        }
+
+        // Poi le altre
+        for (AnnuncioCreateDialog.FotoData fd : fotoDataList) {
+            if (fd.isPrincipale())
+                continue;
+            Foto f = new Foto();
+            f.setPath("images/annunci/" + fd.getDestinationFilename());
+            f.setPrincipale(false);
+            fotoList.add(f);
+        }
+
+        // Safety: se nessuna principale, la prima diventa principale
+        if (!fotoList.isEmpty() && fotoList.stream().noneMatch(Foto::isPrincipale)) {
+            fotoList.get(0).setPrincipale(true);
+        }
+
+        return fotoList;
     }
 }

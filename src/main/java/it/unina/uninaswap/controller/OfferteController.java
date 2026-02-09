@@ -1,17 +1,31 @@
 package it.unina.uninaswap.controller;
 
-import it.unina.uninaswap.dao.*;
-import it.unina.uninaswap.model.entity.*;
+import java.awt.Window;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import it.unina.uninaswap.dao.AnnuncioDAO;
+import it.unina.uninaswap.dao.ConsegnaDAO;
+import it.unina.uninaswap.dao.IndirizzoDAO;
+import it.unina.uninaswap.dao.OffertaDAO;
+import it.unina.uninaswap.dao.RecensioneDAO;
+import it.unina.uninaswap.dao.StudenteDAO;
+import it.unina.uninaswap.dao.TransazioneDAO;
+import it.unina.uninaswap.model.entity.Annuncio;
+import it.unina.uninaswap.model.entity.Indirizzo;
+import it.unina.uninaswap.model.entity.Offerta;
+import it.unina.uninaswap.model.entity.Recensione;
+import it.unina.uninaswap.model.entity.Studente;
+import it.unina.uninaswap.model.entity.Transazione;
 import it.unina.uninaswap.model.enums.StatoOfferta;
 import it.unina.uninaswap.view.AccettaOffertaDialog;
 import it.unina.uninaswap.view.AnnunciMainView;
 import it.unina.uninaswap.view.OffertaEditDialog;
 import it.unina.uninaswap.view.RecensioneDialog;
-
-import javax.swing.*;
-import java.awt.*;
-import java.time.LocalDate;
-import java.util.List;
 
 public class OfferteController {
 
@@ -87,7 +101,8 @@ public class OfferteController {
                     if (!dialog.isConfirmed())
                         return;
 
-                    Offerta edited = dialog.getEditedOfferta();
+                    // Validazione e costruzione Offerta
+                    Offerta edited = validateAndBuildOfferta(dialog);
                     if (edited == null)
                         return;
 
@@ -156,7 +171,8 @@ public class OfferteController {
             if (!dialog.isConfirmed())
                 return;
 
-            Offerta edited = dialog.getEditedOfferta();
+            // Validazione e costruzione Offerta 
+            Offerta edited = validateAndBuildOfferta(dialog);
             if (edited == null)
                 return;
 
@@ -339,5 +355,95 @@ public class OfferteController {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(view, "Errore durante l'operazione sull'offerta:\n" + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+
+    private Offerta validateAndBuildOfferta(OffertaEditDialog dialog) {
+        Offerta originalOfferta = dialog.getOriginalOfferta();
+        Annuncio annuncio = dialog.getAnnuncio();
+
+        if (originalOfferta == null) {
+            dialog.showError("Errore interno: offerta non inizializzata.");
+            return null;
+        }
+
+        String tipo = (annuncio != null) ? annuncio.getTipologia() : null;
+
+        boolean vendita = "Vendita".equalsIgnoreCase(tipo);
+        boolean scambio = "Scambio".equalsIgnoreCase(tipo);
+        boolean regalo  = "Regalo".equalsIgnoreCase(tipo);
+
+        String sImporto = dialog.getImportoText();
+        String msg = dialog.getMessaggio();
+        String obj = dialog.getOggettoOfferto();
+
+        // Validazione in base alla tipologia
+        if (vendita) {
+            if (sImporto.isBlank()) {
+                dialog.showError("Per una vendita l'importo è obbligatorio.");
+                return null;
+            }
+            try {
+                BigDecimal nuovoImporto = new BigDecimal(sImporto);
+                if (nuovoImporto.compareTo(BigDecimal.ZERO) < 0) {
+                    dialog.showError("L'importo non può essere negativo.");
+                    return null;
+                }
+            } catch (NumberFormatException ex) {
+                dialog.showError("Importo non valido. Usa un numero, es. 10 o 10.50");
+                return null;
+            }
+            // sicurezza coerente con DB
+            obj = "";
+        }
+
+        if (scambio) {
+            if (obj.isBlank()) {
+                dialog.showError("Per uno scambio l'oggetto offerto è obbligatorio.");
+                return null;
+            }
+            // sicurezza coerente con DB
+            sImporto = "";
+        }
+
+        if (regalo) {
+            if (msg.isBlank()) {
+                dialog.showError("Per un regalo il messaggio è obbligatorio.");
+                return null;
+            }
+            // sicurezza coerente con DB
+            sImporto = "";
+            obj = "";
+        }
+
+        // Costruzione Offerta
+        Offerta o = new Offerta();
+        o.setId(originalOfferta.getId());
+        o.setData(originalOfferta.getData());
+        o.setStato(originalOfferta.getStato());
+        o.setIdAnnuncio(originalOfferta.getIdAnnuncio());
+        o.setMatricolaOfferente(originalOfferta.getMatricolaOfferente());
+
+        // importo: se vuoto -> null
+        if (!sImporto.isBlank()) {
+            try {
+                BigDecimal bd = new BigDecimal(sImporto);
+                if (bd.compareTo(BigDecimal.ZERO) < 0) {
+                    dialog.showError("L'importo non può essere negativo.");
+                    return null;
+                }
+                o.setImportoOfferto(bd);
+            } catch (NumberFormatException ex) {
+                dialog.showError("Importo non valido. Usa un numero, es. 10 o 10.50");
+                return null;
+            }
+        } else {
+            o.setImportoOfferto(null);
+        }
+
+        o.setMessaggio(msg.isBlank() ? null : msg);
+        o.setOggettoOfferto(obj.isBlank() ? null : obj);
+
+        return o;
     }
 }

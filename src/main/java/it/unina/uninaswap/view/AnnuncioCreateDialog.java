@@ -12,7 +12,6 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -41,8 +40,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.formdev.flatlaf.FlatClientProperties;
 
-import it.unina.uninaswap.model.entity.Annuncio;
-import it.unina.uninaswap.model.entity.Foto;
 import it.unina.uninaswap.model.entity.Studente;
 import it.unina.uninaswap.util.ImageUtil;
 import it.unina.uninaswap.util.UITheme;
@@ -67,8 +64,6 @@ public class AnnuncioCreateDialog extends JDialog {
     private final List<FotoWrapper> fotoWrappers = new ArrayList<>();
 
     private boolean confirmed = false;
-    private Annuncio createdAnnuncio;
-    private List<Foto> createdFotoList = new ArrayList<>();
 
     private final Studente venditore; // studente loggato
 
@@ -301,10 +296,8 @@ public class AnnuncioCreateDialog extends JDialog {
         });
 
         btnCrea.addActionListener(e -> {
-            if (validateAndBuildAnnuncio()) {
-                confirmed = true;
-                dispose();
-            }
+            confirmed = true;
+            dispose();
         });
     }
 
@@ -461,7 +454,7 @@ public class AnnuncioCreateDialog extends JDialog {
             if (dot >= 0)
                 ext = name.substring(dot);
 
-            // Nome robusto (evita collisioni)
+            
             String safeName = System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 8) + ext;
 
             boolean isPrincipale = fotoWrappers.isEmpty(); // prima foto = principale
@@ -490,157 +483,76 @@ public class AnnuncioCreateDialog extends JDialog {
         }
     }
 
-    private boolean validateAndBuildAnnuncio() {
-        String titolo = txtTitolo.getText().trim();
-        if (titolo.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Inserisci un titolo.", "Errore", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
 
-        String tipologia = (String) cmbTipologia.getSelectedItem();
-        String categoria = (String) cmbCategoria.getSelectedItem();
+    public String getTitolo() {
+        return txtTitolo.getText() != null ? txtTitolo.getText().trim() : "";
+    }
 
-        if (tipologia == null || categoria == null) {
-            JOptionPane.showMessageDialog(this, "Seleziona tipologia e categoria.", "Errore",
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
+    public String getDescrizione() {
+        return txtDescrizione.getText() != null ? txtDescrizione.getText().trim() : "";
+    }
 
-        if (!chkSpedizione.isSelected() && !chkInUni.isSelected()) {
-            JOptionPane.showMessageDialog(this,
-                    "Seleziona almeno una modalità di consegna (spedizione o incontro in uni).",
-                    "Errore",
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
+    public String getTipologia() {
+        return (String) cmbTipologia.getSelectedItem();
+    }
 
-        BigDecimal prezzo = null;
-        if ("Vendita".equals(tipologia)) {
-            String prezzoText = txtPrezzo.getText().trim();
-            if (prezzoText.isEmpty()) {
-                JOptionPane.showMessageDialog(this,
-                        "Per gli annunci di vendita il prezzo è obbligatorio.",
-                        "Errore",
-                        JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-            try {
-                prezzoText = prezzoText.replace(",", ".");
-                prezzo = new BigDecimal(prezzoText);
-                if (prezzo.compareTo(BigDecimal.ZERO) < 0)
-                    throw new NumberFormatException();
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this,
-                        "Prezzo non valido. Usa un numero ≥ 0 (es. 10 o 10.50).",
-                        "Errore",
-                        JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-        }
+    public String getCategoria() {
+        return (String) cmbCategoria.getSelectedItem();
+    }
 
-        String oggettoRich = null;
-        if ("Scambio".equals(tipologia)) {
-            oggettoRich = txtOggettoRichiesto.getText().trim();
-            if (oggettoRich.isEmpty()) {
-                JOptionPane.showMessageDialog(this,
-                        "Per gli annunci di scambio specifica l'oggetto richiesto.",
-                        "Errore",
-                        JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-        }
+    public String getPrezzoText() {
+        return txtPrezzo.getText() != null ? txtPrezzo.getText().trim() : "";
+    }
 
-        // Safety: se ci sono foto, garantisci 1 sola principale
-        if (!fotoWrappers.isEmpty() && fotoWrappers.stream().noneMatch(f -> f.isPrincipale)) {
-            fotoWrappers.get(0).isPrincipale = true;
-        }
-        boolean found = false;
+    public String getOggettoRichiesto() {
+        return txtOggettoRichiesto.getText() != null ? txtOggettoRichiesto.getText().trim() : "";
+    }
+
+    public boolean isSpedizioneSelected() {
+        return chkSpedizione.isSelected();
+    }
+
+    public boolean isInUniSelected() {
+        return chkInUni.isSelected();
+    }
+
+    public Studente getVenditore() {
+        return venditore;
+    }
+
+
+    // Restituisce i dati delle foto selezionate
+    public List<FotoData> getFotoDataList() {
+        List<FotoData> result = new ArrayList<>();
         for (FotoWrapper fw : fotoWrappers) {
-            if (!fw.isPrincipale)
-                continue;
-            if (!found)
-                found = true;
-            else
-                fw.isPrincipale = false;
+            result.add(new FotoData(fw.sourceFile, fw.destinationFilename, fw.isPrincipale));
+        }
+        return result;
+    }
+
+
+    public static class FotoData {
+        private final File sourceFile;
+        private final String destinationFilename;
+        private final boolean principale;
+
+        public FotoData(File sourceFile, String destinationFilename, boolean principale) {
+            this.sourceFile = sourceFile;
+            this.destinationFilename = destinationFilename;
+            this.principale = principale;
         }
 
-        // Copia fisica delle foto selezionate
-        for (FotoWrapper fw : fotoWrappers) {
-            try {
-                ImageUtil.copyToAnnunciDirs(fw.sourceFile, fw.destinationFilename);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this,
-                        "Errore copia foto:\n" + ex.getMessage(),
-                        "Errore",
-                        JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-        }
+        public File getSourceFile() { return sourceFile; }
+        public String getDestinationFilename() { return destinationFilename; }
+        public boolean isPrincipale() { return principale; }
+    }
 
-        // Build annuncio
-        Annuncio a = new Annuncio();
-        a.setTitolo(titolo);
-
-        String descr = txtDescrizione.getText().trim();
-        a.setDescrizione(descr.isEmpty() ? null : descr);
-
-        a.setTipologia(tipologia);
-        a.setCategoria(categoria);
-        a.setOggettoRichiesto(oggettoRich);
-        a.setConcluso(false);
-        a.setPrezzo(prezzo);
-
-        a.setOffreSpedizione(chkSpedizione.isSelected());
-        a.setOffreIncontroInUni(chkInUni.isSelected());
-
-        if (venditore != null) {
-            a.setMatricolaVenditore(venditore.getMatricola());
-        }
-
-        this.createdAnnuncio = a;
-
-        // Foto list per controller 
-        // principale PRIMA nella lista (evita errore con trigger DB)
-        this.createdFotoList = new ArrayList<>();
-
-        for (FotoWrapper fw : fotoWrappers) {
-            if (!fw.isPrincipale)
-                continue;
-            Foto f = new Foto();
-            f.setPath("images/annunci/" + fw.destinationFilename);
-            f.setPrincipale(true);
-            this.createdFotoList.add(f);
-            break;
-        }
-
-
-        for (FotoWrapper fw : fotoWrappers) {
-            if (fw.isPrincipale)
-                continue;
-            Foto f = new Foto();
-            f.setPath("images/annunci/" + fw.destinationFilename);
-            f.setPrincipale(false);
-            this.createdFotoList.add(f);
-        }
-
-
-        if (!this.createdFotoList.isEmpty() && this.createdFotoList.stream().noneMatch(Foto::isPrincipale)) {
-            this.createdFotoList.get(0).setPrincipale(true);
-        }
-
-        return true;
+    public void showError(String message) {
+        JOptionPane.showMessageDialog(this, message, "Errore", JOptionPane.ERROR_MESSAGE);
     }
     
     
     public boolean isConfirmed() {
         return confirmed;
-    }
-
-    public Annuncio getCreatedAnnuncio() {
-        return confirmed ? createdAnnuncio : null;
-    }
-
-    public List<Foto> getCreatedFotoList() {
-        return confirmed ? createdFotoList : new ArrayList<>();
     }
 }

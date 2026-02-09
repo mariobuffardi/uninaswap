@@ -1,17 +1,33 @@
 package it.unina.uninaswap.view;
 
-import it.unina.uninaswap.model.entity.Annuncio;
-import it.unina.uninaswap.model.entity.Offerta;
-import it.unina.uninaswap.util.UITheme;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import com.formdev.flatlaf.FlatClientProperties;
 
-import java.awt.*;
-import java.math.BigDecimal;
+import it.unina.uninaswap.model.entity.Annuncio;
+import it.unina.uninaswap.model.entity.Offerta;
+import it.unina.uninaswap.util.UITheme;
 
 public class OffertaEditDialog extends JDialog {
 
@@ -29,7 +45,6 @@ public class OffertaEditDialog extends JDialog {
     private JLabel lblHint;
 
     private boolean confirmed = false;
-    private Offerta editedOfferta;
 
     public OffertaEditDialog(JFrame parent, Offerta offerta, Annuncio annuncio) {
         super(parent, computeDialogTitle(offerta, annuncio), true);
@@ -131,7 +146,6 @@ public class OffertaEditDialog extends JDialog {
 
         btnAnnulla.addActionListener(e -> {
             confirmed = false;
-            editedOfferta = null;
             dispose();
         });
 
@@ -207,99 +221,33 @@ public class OffertaEditDialog extends JDialog {
     }
 
     private void onSave() {
-        try {
-            if (originalOfferta == null) {
-                JOptionPane.showMessageDialog(this,
-                        "Errore interno: offerta non inizializzata.",
-                        "Errore", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            String tipo = (annuncio != null) ? annuncio.getTipologia() : null;
-
-            boolean vendita = "Vendita".equalsIgnoreCase(tipo);
-            boolean scambio = "Scambio".equalsIgnoreCase(tipo);
-            boolean regalo  = "Regalo".equalsIgnoreCase(tipo);
-
-            String sImporto = (txtImporto.getText() != null) ? txtImporto.getText().trim() : "";
-            String msg = (txtMessaggio.getText() != null) ? txtMessaggio.getText().trim() : "";
-            String obj = (txtOggettoOfferto.getText() != null) ? txtOggettoOfferto.getText().trim() : "";
+        confirmed = true;
+        dispose();
+    }
 
 
-            if (vendita) {
-                if (sImporto.isBlank()) {
-                    JOptionPane.showMessageDialog(this,
-                            "Per una vendita l'importo è obbligatorio.",
-                            "Errore", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                BigDecimal nuovoImporto = new BigDecimal(sImporto);
-                if (nuovoImporto.compareTo(BigDecimal.ZERO) < 0) {
-                    JOptionPane.showMessageDialog(this,
-                            "L'importo non può essere negativo.",
-                            "Errore", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                // sicurezza coerente con DB
-                obj = "";
-            }
+    public String getImportoText() {
+        return (txtImporto.getText() != null) ? txtImporto.getText().trim() : "";
+    }
 
-            if (scambio) {
-                if (obj.isBlank()) {
-                    JOptionPane.showMessageDialog(this,
-                            "Per uno scambio l'oggetto offerto è obbligatorio.",
-                            "Errore", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                // sicurezza coerente con DB
-                sImporto = "";
-            }
+    public String getMessaggio() {
+        return (txtMessaggio.getText() != null) ? txtMessaggio.getText().trim() : "";
+    }
 
-            if (regalo) {
-                if (msg.isBlank()) {
-                    JOptionPane.showMessageDialog(this,
-                            "Per un regalo il messaggio è obbligatorio.",
-                            "Errore", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                // sicurezza coerente con DB
-                sImporto = "";
-                obj = "";
-            }
+    public String getOggettoOfferto() {
+        return (txtOggettoOfferto.getText() != null) ? txtOggettoOfferto.getText().trim() : "";
+    }
 
-            Offerta o = new Offerta();
-            o.setId(originalOfferta.getId());
-            o.setData(originalOfferta.getData());
-            o.setStato(originalOfferta.getStato());
-            o.setIdAnnuncio(originalOfferta.getIdAnnuncio());
-            o.setMatricolaOfferente(originalOfferta.getMatricolaOfferente());
+    public Offerta getOriginalOfferta() {
+        return originalOfferta;
+    }
 
-            // importo: se vuoto -> null
-            if (!sImporto.isBlank()) {
-                BigDecimal bd = new BigDecimal(sImporto);
-                if (bd.compareTo(BigDecimal.ZERO) < 0) {
-                    JOptionPane.showMessageDialog(this,
-                            "L'importo non può essere negativo.",
-                            "Errore", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                o.setImportoOfferto(bd);
-            } else {
-                o.setImportoOfferto(null);
-            }
+    public Annuncio getAnnuncio() {
+        return annuncio;
+    }
 
-            o.setMessaggio(msg.isBlank() ? null : msg);
-            o.setOggettoOfferto(obj.isBlank() ? null : obj);
-
-            this.editedOfferta = o;
-            this.confirmed = true;
-            dispose();
-
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Importo non valido. Usa un numero, es. 10 o 10.50",
-                    "Errore", JOptionPane.ERROR_MESSAGE);
-        }
+    public void showError(String message) {
+        JOptionPane.showMessageDialog(this, message, "Errore", JOptionPane.ERROR_MESSAGE);
     }
 
 
@@ -309,9 +257,5 @@ public class OffertaEditDialog extends JDialog {
 
     public boolean isConfirmed() {
         return confirmed;
-    }
-
-    public Offerta getEditedOfferta() {
-        return editedOfferta;
     }
 }
