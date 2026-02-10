@@ -48,6 +48,7 @@ public class LoginView extends JFrame {
         setTitle("UniNaSwap - Accesso");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 700);
+        setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
 
         loadResources();

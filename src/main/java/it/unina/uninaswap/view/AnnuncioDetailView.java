@@ -1,16 +1,35 @@
 package it.unina.uninaswap.view;
 
-import it.unina.uninaswap.model.entity.Annuncio;
-import it.unina.uninaswap.model.entity.Studente;
-import it.unina.uninaswap.util.UITheme;
-import com.formdev.flatlaf.FlatClientProperties;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+
+import com.formdev.flatlaf.FlatClientProperties;
+
+import it.unina.uninaswap.model.entity.Annuncio;
+import it.unina.uninaswap.model.entity.Studente;
+import it.unina.uninaswap.util.ImageUtil;
+import it.unina.uninaswap.util.UITheme;
 
 public class AnnuncioDetailView extends JPanel {
 
@@ -256,7 +275,7 @@ public class AnnuncioDetailView extends JPanel {
         venditoreCard.add(vLeft, BorderLayout.CENTER);
 
         btnVediProfiloVenditore = new JButton("Vedi profilo venditore");
-        styleSecondaryButton(btnVediProfiloVenditore);
+        stylePrimaryButton(btnVediProfiloVenditore);
 
         JPanel btnWrap = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         btnWrap.setOpaque(false);
@@ -347,17 +366,6 @@ public class AnnuncioDetailView extends JPanel {
         b.setContentAreaFilled(true);
     }
 
-    private void styleSecondaryButton(JButton b) {
-        b.putClientProperty(FlatClientProperties.STYLE,
-                "arc: 12; " +
-                        "background: #D7E3F2; foreground: #1B415D; " +
-                        "hoverBackground: #C5D8EB; pressedBackground: #B0C9E0;");
-        b.setFocusable(false);
-        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        b.setBorderPainted(false);
-    }
-    
-    
     
     public void setData(Annuncio annuncio, Studente venditore, List<ImageIcon> foto) {
         this.currentAnnuncio = annuncio;
@@ -381,7 +389,7 @@ public class AnnuncioDetailView extends JPanel {
                 thumbnailsPanel.add(thumb);
             }
         } else {
-            ImageIcon rawIcon = getDefaultIconForCategoria(annuncio.getCategoria());
+            ImageIcon rawIcon = ImageUtil.defaultForCategoria(annuncio.getCategoria());
             Image scaled = rawIcon.getImage().getScaledInstance(320, 240, Image.SCALE_SMOOTH);
             lblMainPhoto.setIcon(new ImageIcon(scaled));
         }
@@ -476,31 +484,6 @@ public class AnnuncioDetailView extends JPanel {
         } catch (Exception e) {
             lblVenditoreFoto.setIcon(null);
         }
-    }
-
-    private ImageIcon getDefaultIconForCategoria(String categoria) {
-        String path;
-        switch (categoria) {
-            case "Strumenti_musicali":
-                path = "/images/categories/strumenti.png";
-                break;
-            case "Libri":
-                path = "/images/categories/libri.jpg";
-                break;
-            case "Informatica":
-                path = "/images/categories/informatica.jpg";
-                break;
-            case "Abbigliamento":
-                path = "/images/categories/abbigliamento.jpg";
-                break;
-            case "Arredo":
-                path = "/images/categories/arredo.jpg";
-                break;
-            default:
-                path = "/images/categories/altro.jpg";
-                break;
-        }
-        return new ImageIcon(getClass().getResource(path));
     }
 
     public void updateAzioniForLoggedIn(String matricolaLoggedIn) {

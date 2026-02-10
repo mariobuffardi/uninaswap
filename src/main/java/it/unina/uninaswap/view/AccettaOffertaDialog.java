@@ -13,19 +13,15 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-
 
 import it.unina.uninaswap.model.entity.Annuncio;
 import it.unina.uninaswap.model.entity.Indirizzo;
@@ -69,7 +65,8 @@ public class AccettaOffertaDialog extends JDialog {
     private JRadioButton rdbSpedizione;
     private JRadioButton rdbInUni;
 
-    private JComboBox<Indirizzo> cmbIndirizzi;
+    private Indirizzo indirizzoSpedizione;
+    private JLabel lblIndirizzoSpedizione;
 
     private JTextField txtDataIncontro;
     private JTextField txtSedeUni;
@@ -117,9 +114,12 @@ public class AccettaOffertaDialog extends JDialog {
         content.add(Box.createVerticalStrut(10));
 
         // Radio buttons modalità
+        indirizzoSpedizione = (indirizziAcquirente != null && !indirizziAcquirente.isEmpty())
+            ? indirizziAcquirente.get(0)
+            : null;
+
         boolean canSpedire = acquirente.getPreferisceSpedizione()
-                && indirizziAcquirente != null
-                && !indirizziAcquirente.isEmpty();
+            && indirizzoSpedizione != null;
 
         boolean canInUni = acquirente.getPreferisceIncontroInUni();
 
@@ -153,33 +153,15 @@ public class AccettaOffertaDialog extends JDialog {
         JPanel panelSpedizione = new JPanel(new BorderLayout(5,5));
         panelSpedizione.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(UITheme.BORDER_LIGHT), "Spedizione"));
         panelSpedizione.setBackground(UITheme.WHITE);
-        cmbIndirizzi = new JComboBox<>();
-        if (indirizziAcquirente != null) {
-            for (Indirizzo ind : indirizziAcquirente) {
-                cmbIndirizzi.addItem(ind);
-            }
-        }
-
-        // Renderer per mostrare l'indirizzo in modo leggibile
-        cmbIndirizzi.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(
-                    JList<?> list, Object value, int index,
-                    boolean isSelected, boolean cellHasFocus) {
-
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Indirizzo) {
-                    Indirizzo i = (Indirizzo) value;
-                    String label = i.getVia() + " " + i.getCivico()
-                            + " - " + i.getCitta() + " (" + i.getCap() + ")";
-                    setText(label);
-                }
-                return this;
-            }
-        });
 
         panelSpedizione.add(new JLabel("Indirizzo di spedizione:"), BorderLayout.NORTH);
-        panelSpedizione.add(cmbIndirizzi, BorderLayout.CENTER);
+        String indirizzoText = "-";
+        if (indirizzoSpedizione != null) {
+            indirizzoText = indirizzoSpedizione.getVia() + " " + indirizzoSpedizione.getCivico()
+                    + " - " + indirizzoSpedizione.getCitta() + " (" + indirizzoSpedizione.getCap() + ")";
+        }
+        lblIndirizzoSpedizione = new JLabel(indirizzoText);
+        panelSpedizione.add(lblIndirizzoSpedizione, BorderLayout.CENTER);
 
         content.add(panelSpedizione);
         content.add(Box.createVerticalStrut(10));
@@ -281,7 +263,7 @@ public class AccettaOffertaDialog extends JDialog {
             if (rdbSpedizione.isSelected() && rdbSpedizione.isEnabled()) {
             	
                 // SPEDIZIONE
-                Indirizzo sel = (Indirizzo) cmbIndirizzi.getSelectedItem();
+                Indirizzo sel = indirizzoSpedizione;
                 if (sel == null) {
                     JOptionPane.showMessageDialog(this,
                             "Seleziona un indirizzo di spedizione.",

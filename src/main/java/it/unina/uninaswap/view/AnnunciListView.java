@@ -37,7 +37,7 @@ public class AnnunciListView extends JPanel {
     private int visibleCols = 4;
 
     private static final int CARD_W = 260;
-    private static final int CARD_H = 280;
+    private static final int CARD_H = 320;
     private static final int HGAP = 24;
     private static final int VGAP = 24;
 
@@ -186,7 +186,7 @@ public class AnnunciListView extends JPanel {
         // FOTO 
         JPanel photoWrap = new JPanel(new BorderLayout());
         photoWrap.setOpaque(false);
-        photoWrap.setBorder(new EmptyBorder(12, 12, 6, 12));
+        photoWrap.setBorder(new EmptyBorder(10, 12, 4, 12));
 
         JLabel lblFoto = new JLabel();
         lblFoto.setHorizontalAlignment(SwingConstants.CENTER);
@@ -199,8 +199,7 @@ public class AnnunciListView extends JPanel {
         if (baseIcon == null)
             baseIcon = ImageUtil.defaultForCategoria(annuncio.getCategoria());
 
-        String key = (fotoNomeFile != null ? fotoNomeFile : "cat_" + annuncio.getCategoria());
-        ImageIcon icon = ImageUtil.scaled(baseIcon, 150, 150);
+        ImageIcon icon = ImageUtil.scaled(baseIcon, 140, 140);
         lblFoto.setIcon(icon);
 
         photoWrap.add(lblFoto, BorderLayout.CENTER);
@@ -225,20 +224,19 @@ public class AnnunciListView extends JPanel {
         infoPanel.add(lblTipo);
 
         BigDecimal prezzo = annuncio.getPrezzo();
-        if (prezzo != null) {
-            infoPanel.add(Box.createVerticalStrut(8));
-            JLabel lblPrezzo = new JLabel("€ " + prezzo.toPlainString());
-            lblPrezzo.setForeground(TITLE);
-            lblPrezzo.setFont(lblPrezzo.getFont().deriveFont(Font.BOLD, 16f));
-            infoPanel.add(lblPrezzo);
-        }
+        infoPanel.add(Box.createVerticalStrut(8));
+        String prezzoText = (prezzo != null) ? "€ " + prezzo.toPlainString() : "€ -";
+        JLabel lblPrezzo = new JLabel(prezzoText);
+        lblPrezzo.setForeground(TITLE);
+        lblPrezzo.setFont(lblPrezzo.getFont().deriveFont(Font.BOLD, 16f));
+        infoPanel.add(lblPrezzo);
 
         card.add(infoPanel, BorderLayout.CENTER);
 
         // AZIONI
-        JPanel actions = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 6));
         actions.setOpaque(false);
-        actions.setBorder(new EmptyBorder(0, 10, 10, 10));
+        actions.setBorder(new EmptyBorder(0, 10, 8, 10));
 
         String tip = annuncio.getTipologia();
 
