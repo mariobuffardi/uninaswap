@@ -8,3 +8,8 @@ target/
 
 # OS
 .DS_Store
+
+# IntelliJ / JetBrains
+.idea/
+*.iml
+out/
