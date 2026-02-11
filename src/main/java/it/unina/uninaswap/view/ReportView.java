@@ -1,9 +1,36 @@
 package it.unina.uninaswap.view;
 
-import it.unina.uninaswap.model.enums.TipoAnnuncio;
-import it.unina.uninaswap.model.enums.TipoCategoria;
-import it.unina.uninaswap.util.ChartUtil;
-import it.unina.uninaswap.util.UITheme;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.EnumMap;
+import java.util.Locale;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -13,15 +40,10 @@ import org.jfree.data.category.CategoryDataset;
 
 import com.formdev.flatlaf.FlatClientProperties;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
-
-import java.awt.*;
-import java.math.BigDecimal;
-import java.util.EnumMap;
+import it.unina.uninaswap.model.enums.TipoAnnuncio;
+import it.unina.uninaswap.model.enums.TipoCategoria;
+import it.unina.uninaswap.util.ChartUtil;
+import it.unina.uninaswap.util.UITheme;
 
 public class ReportView extends JPanel {
 
@@ -509,7 +531,7 @@ public class ReportView extends JPanel {
         lblTotArrivateVendite.setText("Totale offerte arrivate: " + data.venditePerCategoria.totaleArrivate);
         lblTotAccettateVendite.setText("Totale accettate: " + data.venditePerCategoria.totaleAccettate);
 
-        lblMediaVendite.setText("Media: " + formatMoney(data.mediaVendite));
+        lblMediaVendite.setText("Media: " + formatMoney2(data.mediaVendite));
         lblMinVendite.setText("Min: " + formatMoney(data.minVendite));
         lblMaxVendite.setText("Max: " + formatMoney(data.maxVendite));
 
@@ -539,7 +561,7 @@ public class ReportView extends JPanel {
         lblTotInviateAcquisti.setText("Totale offerte inviate: " + data.acquistiPerCategoria.totaleArrivate);
         lblTotAccettateAcquisti.setText("Totale accettate: " + data.acquistiPerCategoria.totaleAccettate);
 
-        lblMediaAcquisti.setText("Media: " + formatMoney(data.mediaAcquisti));
+        lblMediaAcquisti.setText("Media: " + formatMoney2(data.mediaAcquisti));
         lblMinAcquisti.setText("Min: " + formatMoney(data.minAcquisti));
         lblMaxAcquisti.setText("Max: " + formatMoney(data.maxAcquisti));
 
@@ -619,6 +641,15 @@ public class ReportView extends JPanel {
     private String formatMoney(BigDecimal v) {
         if (v == null) return "-";
         return v.toPlainString() + " €";
+    }
+
+    private String formatMoney2(BigDecimal v) {
+        if (v == null) return "-";
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.ITALY);
+        DecimalFormat df = new DecimalFormat("0.00", symbols);
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        df.setGroupingUsed(false);
+        return df.format(v) + " €";
     }
 
 
